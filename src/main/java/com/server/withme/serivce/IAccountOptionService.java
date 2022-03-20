@@ -14,7 +14,7 @@ public interface IAccountOptionService {
 
 	public AccountOption signUpOption(SignupDto signupDto);
 	
-	public AccountOption updateAccountOption(UUID accountId);
+	public AccountOption updateAccountOption(UUID accountId, Double latitude, Double longitude);
 	
 	public AccountOption findByAccountIdOrThrow(UUID accountId);
 }

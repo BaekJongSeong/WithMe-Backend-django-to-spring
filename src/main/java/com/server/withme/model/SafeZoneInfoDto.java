@@ -1,5 +1,7 @@
 package com.server.withme.model;
 
+import java.util.Date;
+
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -9,20 +11,17 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /**
-* DTO for Vertex API
-* latitude and longitude in vertex
-*
-* @author Jongseong Baek
-*/
+ * DTO for SafeZoneInfo API
+ *
+ * @author Jongseong Baek
+ */
 @Getter
 @Setter
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class VertexDto {
-	@NotNull
-    private Double latitude;
+public class SafeZoneInfoDto {
 
-    @NotNull
-    private Double longitude;
+	@NotNull
+	private String message;
 }

@@ -4,6 +4,7 @@ import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.Supplier;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -42,14 +43,13 @@ public class AccountService implements IAccountService {
                 .username(account.getUsername())
                 .timestamp(account.getTimestamp())
                 .name(account.getName())
-                .email(account.getEmail())
-                .build();
+                .email(account.getEmail()).build();
     }
 	
 	@Override
-	public Account checkForSignup(SignupDto signupDto) {	
-	    return accountRepository.findByUsername(signupDto.getUsername())
-	    		.orElse(this.createAccount(signupDto, "USER"));
+	public Account checkForSignup(SignupDto signupDto) {
+	    return accountRepository.findByUsername(signupDto.getLoginDto().getUsername())
+	    		.orElseGet((()-> this.createAccount(signupDto, "USER")));
 	}
 
 	
@@ -61,8 +61,8 @@ public class AccountService implements IAccountService {
 	    @SuppressWarnings("static-access")
 		Account newAccount = Account.builder()
 	    			.timestamp(Timestamp.valueOf(sdf.format(Timestamp)))
-	                .username(signupDto.getUsername())
-	                .password(passwordEncoder.encode(signupDto.getPassword()))
+	                .username(signupDto.getLoginDto().getUsername())
+	                .password(passwordEncoder.encode(signupDto.getLoginDto().getPassword()))
 	                .name(signupDto.getName())
 	                .email(signupDto.getEmail())
 	                .emailVerified(false)
@@ -86,8 +86,7 @@ public class AccountService implements IAccountService {
 		Account account = this.findByUsernameOrThrow(loginDto.getUsername());
 		
 		return AccountIdDto.builder()
-				.accountId(account.getAccountId())
-				.build();
+				.accountId(account.getAccountId()).build();
 	}
 	
 	 @Override

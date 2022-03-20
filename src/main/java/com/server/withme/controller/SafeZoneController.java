@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.withme.model.InitSafeZoneDto;
+import com.server.withme.model.SafeZoneInfoDto;
+import com.server.withme.model.SafeZoneInfoDto.SafeZoneInfoDtoBuilder;
 import com.server.withme.serivce.ISafeZoneService;
 
 import lombok.RequiredArgsConstructor;
@@ -30,21 +32,26 @@ public class SafeZoneController {
 	private final ISafeZoneService safeZoneService;
 	
 	@PostMapping("/init-safe-zone/{accountId}")
-    public ResponseEntity<String> saveInitSafeZone (
+    public ResponseEntity<SafeZoneInfoDto> saveInitSafeZone (
             @PathVariable UUID accountId,
             @Validated @RequestBody InitSafeZoneDto initSafeZoneDto
     ) {
-		safeZoneService.saveInitSafeZone(initSafeZoneDto, accountId);
-        return new ResponseEntity<>("safe zone 등록에 성공하였습니다",new HttpHeaders(),HttpStatus.OK);
+		SafeZoneInfoDto safeZoneInfoDto = new SafeZoneInfoDto();
+		if(safeZoneService.saveInitSafeZone(initSafeZoneDto, accountId))
+			safeZoneInfoDto.setMessage("safe zone 등록이 완료되었습니다.");
+		else
+			safeZoneInfoDto.setMessage("safe zone 최소 size를 위반하여 등록되지 않았습니다.");
+			return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
     }
 	
-	@PostMapping("/zone-location/{accountId}")
-    public ResponseEntity<String> saveZoneLocation (
+	@PostMapping("/safe-zone/{accountId}")
+    public ResponseEntity<SafeZoneInfoDto> saveSafeZone (
             @PathVariable UUID accountId,
             @Validated @RequestBody InitSafeZoneDto initSafeZoneDto
     ) {
 		safeZoneService.saveSafeZone(initSafeZoneDto,accountId);
-        return new ResponseEntity<>("safe zone을 분할하여 전체 등록에 성공하였습니다",new HttpHeaders(),HttpStatus.OK);
+        return new ResponseEntity<>(SafeZoneInfoDto.builder()
+        		.message("safe zone을 분할하여 전체 등록에 성공하였습니다").build(),new HttpHeaders(),HttpStatus.OK);
     }
 	
 }

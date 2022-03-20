@@ -8,5 +8,5 @@ import com.server.withme.model.AccountIdDto;
  */
 public interface ITTLService {
 	
-	public void saveTTL(Integer count, AccountIdDto accountIdDto);
+	public void saveTTL(AccountIdDto accountIdDto);
 }

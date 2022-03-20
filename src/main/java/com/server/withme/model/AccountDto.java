@@ -1,10 +1,7 @@
 package com.server.withme.model;
 
-import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
-
-import org.springframework.security.core.GrantedAuthority;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.sun.istack.NotNull;

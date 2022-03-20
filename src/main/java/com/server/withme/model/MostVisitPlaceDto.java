@@ -23,8 +23,5 @@ public class MostVisitPlaceDto {
     private String place;
 
     @NotNull
-    private Double latitude;
-    
-    @NotNull
-    private Double longitude;
+    private VertexDto vertexDto;
 }

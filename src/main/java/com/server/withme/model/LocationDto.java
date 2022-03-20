@@ -21,8 +21,5 @@ public class LocationDto {
     private Date timestamp;  
 	
     @NotNull
-    private String latitude;
-
-    @NotNull
-    private String longitude;
+    private VertexDto vertexDto;
 }

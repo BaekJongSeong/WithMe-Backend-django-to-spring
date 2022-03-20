@@ -34,7 +34,7 @@ public class AccountOptionService implements IAccountOptionService{
 	//양방향이니까 양쪽 다 들고 있어야함
 	@Override
 	public AccountOption signUpOption(SignupDto signupDto) {
-		Account account = accountService.findByUsernameOrThrow(signupDto.getUsername());
+		Account account = accountService.findByUsernameOrThrow(signupDto.getLoginDto().getUsername());
 		AccountOption accountOption = AccountOption.builder()
 										.boxSize(100)
 										.distance(0.0)
@@ -42,23 +42,23 @@ public class AccountOptionService implements IAccountOptionService{
 										.safeMove(false)
 										.xPoint(null)
 										.yPoint(null)
-										.account(account)
-										.build();
+										.account(account).build();
 		return accountOptionRepository.save(accountOption);
 	}
 	
 	@Override
-	public AccountOption updateAccountOption(UUID accountId) {
+	public AccountOption updateAccountOption(UUID accountId, Double latitude, Double longitude) {
 		//먼저 uuid인 accountID로 id를 찾고 id를 사용해야지
 		AccountOption accountOption = this.findByAccountIdOrThrow(accountId);
 		accountOption.setInitSafeZone(true);
-		
+		accountOption.setXPoint(latitude);
+		accountOption.setYPoint(longitude);
 		return accountOptionRepository.save(accountOption);
 	}
 	
 	@Override
 	public AccountOption findByAccountIdOrThrow(UUID accountId) {
-		Account account = accountRepository.findJoinFetch(accountId);
+		Account account = accountRepository.findByJoinFetch(accountId);
 	
 		return account.getAccountOption();
 	}

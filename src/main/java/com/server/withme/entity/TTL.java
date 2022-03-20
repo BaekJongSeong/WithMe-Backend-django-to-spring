@@ -60,7 +60,7 @@ public class TTL implements Serializable {
 	 @ApiModelProperty(notes = "setting safe zone list expired time, limit 7 days")
 	 private Date ttl;  
 	 
-	 @OneToMany(mappedBy="safeZone", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
+	 @OneToMany(mappedBy="ttl", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	 private List<SafeZone> safeZoneList = new LinkedList<>();
 	 
 	 @ManyToOne

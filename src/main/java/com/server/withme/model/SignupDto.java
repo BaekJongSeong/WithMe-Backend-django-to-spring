@@ -13,13 +13,10 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SignupDto {
+public class SignupDto{
 
     @NotNull
-    private String username;
-
-    @NotNull
-    private String password;
+    private LoginDto loginDto;
 
     @NotNull
     private String name;

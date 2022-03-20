@@ -13,7 +13,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginDto {
+public class LoginDto{
 
     @NotNull
     private String username;

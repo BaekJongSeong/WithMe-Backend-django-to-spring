@@ -11,6 +11,7 @@ import com.server.withme.model.AccountIdDto;
 import com.server.withme.repository.TTLRepository;
 import com.server.withme.serivce.IAccountOptionService;
 import com.server.withme.serivce.ITTLService;
+import com.server.withme.util.IVertexUtil;
 
 import lombok.RequiredArgsConstructor;
 /**
@@ -26,11 +27,14 @@ public class TTLService implements ITTLService{
 	
 	private final TTLRepository ttlRepository;
 	
+	private final IVertexUtil vertexUtil;
+	
 	@SuppressWarnings("static-access")
 	@Override
-	public void saveTTL(Integer count, AccountIdDto accountIdDto) {
+	public void saveTTL(AccountIdDto accountIdDto) {
 		
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
+		Integer count = vertexUtil.countSafeZone(accountOption);
 		
 		Timestamp Timestamp = new Timestamp(System.currentTimeMillis());
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
@@ -38,8 +42,7 @@ public class TTLService implements ITTLService{
 		for(int idx=0; idx< count; idx++) {
 			ttlRepository.save(TTL.builder()
 						.ttl(Timestamp.valueOf(sdf.format(Timestamp)))
-						.accountOption(accountOption)
-						.build());
+						.accountOption(accountOption).build());
 		}
 	}
 }

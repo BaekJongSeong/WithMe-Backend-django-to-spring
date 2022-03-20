@@ -15,5 +15,5 @@ public interface AccountRepository extends JpaRepository<Account, String> {
     Optional<Account> findByAccountId(UUID accountId);
     
     @Query("select DISTINCT c from Account c left join fetch c.accountOption where c.accountId=?1")
-    Account findJoinFetch(UUID accountId);
+    Account findByJoinFetch(UUID accountId);
 }

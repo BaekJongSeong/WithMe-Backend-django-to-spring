@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.server.withme.model.SafeZoneInfoDto;
 import com.server.withme.model.SendMailDto;
 import com.server.withme.serivce.IMailService;
 
@@ -27,11 +28,12 @@ public class MailController {
 	private final IMailService mailService;
 	
 	@PostMapping("/mail")
-    public ResponseEntity<String> sendMail (
+    public ResponseEntity<SafeZoneInfoDto> sendMail (
             @Validated @RequestBody SendMailDto sendMailDto
     ) {
 		mailService.sendMail(sendMailDto);
 		
-        return new ResponseEntity<>("이메일 전송이 성공하였습니다",new HttpHeaders(),HttpStatus.OK);
+		 return new ResponseEntity<>(SafeZoneInfoDto.builder()
+	        		.message("이메일 전송에 성공하였습니다.").build(),new HttpHeaders(),HttpStatus.OK);
     }
 }
