@@ -1,4 +1,6 @@
 package com.server.withme.serivce;
+import java.util.UUID;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.server.withme.entity.Account;
@@ -23,4 +25,7 @@ public interface IAccountService extends UserDetailsService {
     
     public AccountIdDto getAccountId(LoginDto loginDto);
 
+    public Account findByAccountIdOrThrow(UUID accountId);
+    
+    public Account findByUsernameOrThrow(String username);
 }

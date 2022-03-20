@@ -2,6 +2,8 @@ package com.server.withme.serivce.impl;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,7 +20,7 @@ import com.server.withme.serivce.IAccountService;
 import lombok.RequiredArgsConstructor;
 
 /**
- * Service for AccountService
+ * Service for Account
  *
  * @author Jongseong Baek
  */
@@ -28,13 +30,13 @@ import lombok.RequiredArgsConstructor;
 public class AccountService implements IAccountService {
 
     private final AccountRepository accountRepository;
+    
     private final PasswordEncoder passwordEncoder;
     
 	@Override
     public UserDetails loadUserByUsername(String username) {
-        Account account = accountRepository.findByUsername(username).orElseThrow(() 
-        		-> new UsernameNotFoundException("not found username : " + username));
-
+        Account account = this.findByUsernameOrThrow(username);
+        
         return Account.builder()
                 .accountId(account.getAccountId())
                 .username(account.getUsername())
@@ -72,30 +74,35 @@ public class AccountService implements IAccountService {
 	
 	@Override
 	public Account modifyAccount(AccountIdDto accountIdDto) {
-		Account account = accountRepository.findByAccountId(accountIdDto.getAccountId())
-				.orElseThrow(() -> new UsernameNotFoundException("not found user"));
+		Account account = this.findByAccountIdOrThrow(accountIdDto.getAccountId());
+		account.setEmailVerified(true);
+		account.setUnLocked(true);
 		
-		Account modifyAccount = Account.builder()
-		.timestamp(account.getTimestamp())
-        .username(account.getUsername())
-        .password(account.getPassword())
-        .name(account.getName())
-        .email(account.getEmail())
-        .emailVerified(true)
-        .unLocked(true)
-        .accountType(account.getAccountType()).build();
-		
-		return accountRepository.save(modifyAccount);
+		return accountRepository.save(account);
 	}
 	
 	@Override
 	public AccountIdDto getAccountId(LoginDto loginDto) {
-		Account account = accountRepository.findByUsername(loginDto.getUsername())
-				.orElseThrow(() -> new UsernameNotFoundException("not found user"));
+		Account account = this.findByUsernameOrThrow(loginDto.getUsername());
 		
 		return AccountIdDto.builder()
 				.accountId(account.getAccountId())
 				.build();
 	}
 	
+	 @Override
+	    public Account findByAccountIdOrThrow(UUID accountId){
+	    	Account account = accountRepository.findByAccountId(accountId).orElseThrow(() 
+	        		-> new UsernameNotFoundException("not found user"));
+	    	
+	    	return account;
+	    }
+	    
+	    @Override
+	    public Account findByUsernameOrThrow(String username){
+	    	Account account = accountRepository.findByUsername(username).orElseThrow(() 
+	        		-> new UsernameNotFoundException("not found username : " + username));
+	    	
+	    	return account;
+	    }
 }

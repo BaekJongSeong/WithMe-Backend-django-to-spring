@@ -50,4 +50,7 @@ public class AccountOptionDto {
 	 
 	 @NotNull
 	 private Double yPoint;
+	 
+	 @NotNull
+	 private UUID accountId;
 }

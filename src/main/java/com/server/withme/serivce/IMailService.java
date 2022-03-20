@@ -7,7 +7,7 @@ import org.thymeleaf.context.Context;
 import com.server.withme.model.SendMailDto;
 
 /**
- * Interface for AccountService
+ * Interface for MailService
  *
  * @author Jongseong Baek
  */

@@ -7,6 +7,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -27,6 +28,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@Table(name = "init_safe_zone")
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "InitSafeZone entity: creating safe_zone, just one box(whole safe zone here)")

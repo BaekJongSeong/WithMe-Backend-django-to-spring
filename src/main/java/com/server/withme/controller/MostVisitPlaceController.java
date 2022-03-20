@@ -1,5 +1,7 @@
 package com.server.withme.controller;
 
+import java.util.UUID;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -13,8 +15,8 @@ import com.server.withme.entity.Account;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.SendMailDto;
 import com.server.withme.serivce.IAccountService;
+import com.server.withme.serivce.IMailService;
 
-import kr.ac.ajou.vhex.server.service.IMailService;
 import lombok.RequiredArgsConstructor;
 
 /**
@@ -38,7 +40,7 @@ public class MostVisitPlaceController {
 	
 	@GetMapping("/{accountId}")
     public ResponseEntity<MostVisitPlaceListDto> mostVisitPlace(
-    		@PathVariable String accountId
+    		@PathVariable UUID accountId
     		) {
 		Account account = accountService.getAccountByAccountIdOrThrow(accountId);
 		
@@ -54,7 +56,7 @@ public class MostVisitPlaceController {
 	
 	@GetMapping("/send-location-result/{accountId}")
 	public boolean sendPlaceLocationToMail(
-			@PathVariable String accountId,
+			@PathVariable UUID accountId,
 			@Validated @RequestBody SendMailDto mailDto
 			) {
 		Account account = accountService.getAccountByAccountIdOrThrow(accountId);

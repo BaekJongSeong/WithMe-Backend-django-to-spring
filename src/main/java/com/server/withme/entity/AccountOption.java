@@ -13,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.OneToOne;
+import javax.persistence.Table;
 
 import io.swagger.annotations.ApiModel;
 import io.swagger.annotations.ApiModelProperty;
@@ -34,6 +35,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
+@Table(name = "account_option")
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "AccountOption entity: 1:1 with Account(uuid), option for account")
@@ -71,7 +73,7 @@ public class AccountOption implements Serializable {
 	 private List<Location> loctionList = new LinkedList<>();
 	 
 	 @OneToMany(mappedBy = "accountOption", fetch=FetchType.LAZY , cascade = CascadeType.ALL)
-	 private List<SafeZone> safeZoneList = new LinkedList<>();
+	 private List<TTL> ttlList = new LinkedList<>();
 
 	 @OneToMany(mappedBy = "accountOption", fetch=FetchType.LAZY , cascade = CascadeType.ALL)
 	 private List<MostVisitPlace> mostVisitPlaceList = new LinkedList<>();

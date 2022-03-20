@@ -38,6 +38,7 @@ public class AccountOptionController {
 		 										.distance(accountOption.getDistance())
 		 										.xPoint(accountOption.getXPoint())
 		 										.yPoint(accountOption.getYPoint())
+		 										.accountId(accountOption.getAccount().getAccountId())
 		 										.build();
 		 	
 	        return new ResponseEntity<>(accountOptionDto,new HttpHeaders(), HttpStatus.OK);

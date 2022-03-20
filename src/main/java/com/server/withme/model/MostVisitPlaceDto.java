@@ -14,7 +14,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class BestVisitPlaceDto {
+public class MostVisitPlaceDto {
 
 	@NotNull
 	private Integer grade;

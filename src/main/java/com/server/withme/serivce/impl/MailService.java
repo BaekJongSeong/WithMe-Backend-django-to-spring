@@ -8,17 +8,21 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import com.server.withme.entity.Account;
 import com.server.withme.model.SendMailDto;
-import com.server.withme.repository.AccountRepository;
+import com.server.withme.serivce.IAccountService;
 import com.server.withme.serivce.IMailService;
 
 import lombok.RequiredArgsConstructor;
+/**
+ * Service for Mail
+ *
+ * @author Jongseong Baek
+ */
 
 @RequiredArgsConstructor
 @Service
@@ -26,15 +30,14 @@ public class MailService implements IMailService{
 
     private final JavaMailSender javaMailSender;
     
-    private final AccountRepository accountRepository;
+    private final IAccountService accountService;
     
     protected final TemplateEngine templateEngine;
 	
 	@Override
 	public ArrayList<String> makeMailTemplate(SendMailDto sendMailDto) {
 		Context ctx = new Context();
-		 Account account = accountRepository.findByAccountId(sendMailDto.getAccountId())
-				 .orElseThrow(() -> new UsernameNotFoundException("not found user"));
+		Account account = accountService.findByAccountIdOrThrow(sendMailDto.getAccountId());
 		
 		ctx.setVariable("title", "[WithMe] withme 서비스 이메일 인증");
 		ctx.setVariable("organization", "WithMe");
@@ -52,8 +55,8 @@ public class MailService implements IMailService{
     public boolean sendMail(SendMailDto sendMailDto) {
     	List<String> mailContents = this.makeMailTemplate(sendMailDto);
 
-    	String subject = mailContents.get(1);
-    	String text = mailContents.get(0);
+    	String subject = mailContents.get(0);
+    	String text = mailContents.get(1);
         try {
             MimeMessage message = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(message, true);
