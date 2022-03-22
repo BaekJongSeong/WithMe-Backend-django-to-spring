@@ -6,6 +6,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -14,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.withme.model.InitSafeZoneDto;
 import com.server.withme.model.SafeZoneInfoDto;
-import com.server.withme.model.SafeZoneInfoDto.SafeZoneInfoDtoBuilder;
 import com.server.withme.serivce.ISafeZoneService;
 
 import lombok.RequiredArgsConstructor;
@@ -52,6 +52,15 @@ public class SafeZoneController {
 		safeZoneService.saveSafeZone(initSafeZoneDto,accountId);
         return new ResponseEntity<>(SafeZoneInfoDto.builder()
         		.message("safe zone을 분할하여 전체 등록에 성공하였습니다").build(),new HttpHeaders(),HttpStatus.OK);
+    }
+	
+	@DeleteMapping("/safe-zone-first/{accountId}")
+    public ResponseEntity<SafeZoneInfoDto> deleteSafeZoneFirst (
+            @PathVariable UUID accountId
+    ) {
+		safeZoneService.deleteSafeZoneFirst(accountId);
+        return new ResponseEntity<>(SafeZoneInfoDto.builder()
+        		.message("safe zone을 유저 맞춤형으로 정교화하였습니다").build(),new HttpHeaders(),HttpStatus.OK);
     }
 	
 }

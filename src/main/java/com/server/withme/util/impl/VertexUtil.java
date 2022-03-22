@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.InitSafeZone;
+import com.server.withme.entity.SafeZone;
 import com.server.withme.model.VertexDto;
 import com.server.withme.repository.InitSafeZoneRepository;
 import com.server.withme.util.IVertexUtil;
@@ -125,5 +126,28 @@ public class VertexUtil implements IVertexUtil{
 			x += perBoxSize;
 		}
 		return safeZoneList;
+	}
+	
+	@Override
+	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList){
+		List<SafeZone> deleteSafeZoneList = new ArrayList<>();
+		
+		for(int idx=0; idx<safeZoneList.size(); idx+=4)
+			deleteSafeZoneList.addAll(this.vertifyInAndOut(safeZoneList.subList(idx, idx+4)));
+
+		return deleteSafeZoneList;
+	}
+	
+	@Override
+	public List<SafeZone> vertifyInAndOut(List<SafeZone> safeZoneSubList){
+		List<SafeZone> deleteSafeZoneList = new ArrayList<>();
+		
+		for(SafeZone checkTarget : safeZoneSubList) {
+			for(int idx=0; idx<4; idx++) {
+				int prev = checkTarget[];
+				int next = ;
+			}
+		}
+		return deleteSafeZoneList;
 	}
 }

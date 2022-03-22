@@ -1,5 +1,6 @@
 package com.server.withme.serivce.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -72,6 +73,7 @@ public class SafeZoneService implements ISafeZoneService{
 		int count=0;
 		for(TTL ttl: ttlList) {
 			while(count % 4 == 0) {
+				//spring batch bulk로 create하기
 				safeZoneRepository.save(SafeZone.builder()
 					.latitude(safeZoneList.get(count).getLatitude())
 					.longitude(safeZoneList.get(count).getLongitude())
@@ -79,5 +81,24 @@ public class SafeZoneService implements ISafeZoneService{
 				count++;
 			}
 		}
+	}
+	
+	@Override
+	public void deleteSafeZoneFirst(UUID accountId) {
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+		List<TTL> ttlList= ttlRepository.findByJoinFetch(accountOption.getId());
+		
+		List<SafeZone> safeZoneList = new ArrayList<>();
+		for(TTL ttl: ttlList) {
+			List<SafeZone> tempSafeZoneList = safeZoneRepository.findByJoinFetch(ttl.getId());
+			safeZoneList.addAll(tempSafeZoneList);
+		}
+		
+		List<SafeZone> deleteSafeZoneList = vertexUtil.calculateDeleteVertex(safeZoneList);
+		
+		//spring batch bulk로 delete 하기
+		for(SafeZone deleteSafeZone: deleteSafeZoneList)
+			safeZoneRepository.delete(deleteSafeZone);
+		
 	}
 }

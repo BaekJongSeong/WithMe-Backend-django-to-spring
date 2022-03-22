@@ -16,4 +16,6 @@ public interface ISafeZoneService {
 	
 	public void saveSafeZone(InitSafeZoneDto initSafeZoneDto, UUID accountId);
 	
+	public void deleteSafeZoneFirst(UUID accountId);
+	
 }

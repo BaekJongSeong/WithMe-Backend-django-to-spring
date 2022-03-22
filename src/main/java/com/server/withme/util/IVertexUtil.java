@@ -5,6 +5,7 @@ import java.util.Map;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.InitSafeZone;
+import com.server.withme.entity.SafeZone;
 import com.server.withme.model.VertexDto;
 
 public interface IVertexUtil {
@@ -18,4 +19,9 @@ public interface IVertexUtil {
 	public List<VertexDto> convertInitSafeZoneToVertexDto(List<InitSafeZone> initSafeZoneList);
 	
 	public List<VertexDto> calculateVertex(List<VertexDto> initSafeZoneList);
+	
+	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList);
+	
+	public List<SafeZone> vertifyInAndOut(List<SafeZone> safeZoneSubList);
+
 }
