@@ -1,6 +1,5 @@
 package com.server.withme.serivce;
 
-import java.util.ArrayList;
 import java.util.UUID;
 
 import com.server.withme.model.InitSafeZoneDto;

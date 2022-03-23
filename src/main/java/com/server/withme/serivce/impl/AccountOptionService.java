@@ -6,7 +6,6 @@ import org.springframework.stereotype.Service;
 
 import com.server.withme.entity.Account;
 import com.server.withme.entity.AccountOption;
-import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.SignupDto;
 import com.server.withme.repository.AccountOptionRepository;
 import com.server.withme.repository.AccountRepository;

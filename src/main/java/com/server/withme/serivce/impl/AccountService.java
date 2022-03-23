@@ -2,9 +2,7 @@ package com.server.withme.serivce.impl;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.util.Optional;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;

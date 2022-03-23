@@ -94,7 +94,7 @@ public class SafeZoneService implements ISafeZoneService{
 			safeZoneList.addAll(tempSafeZoneList);
 		}
 		
-		List<SafeZone> deleteSafeZoneList = vertexUtil.calculateDeleteVertex(safeZoneList);
+		List<SafeZone> deleteSafeZoneList = vertexUtil.calculateDeleteVertex(safeZoneList,accountOption);
 		
 		//spring batch bulk로 delete 하기
 		for(SafeZone deleteSafeZone: deleteSafeZoneList)

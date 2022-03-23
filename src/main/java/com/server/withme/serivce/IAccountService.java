@@ -4,7 +4,6 @@ import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.server.withme.entity.Account;
-import com.server.withme.model.AccountDto;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LoginDto;
 import com.server.withme.model.SignupDto;

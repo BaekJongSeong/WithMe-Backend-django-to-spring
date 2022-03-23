@@ -10,9 +10,13 @@ import org.springframework.stereotype.Component;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.InitSafeZone;
+import com.server.withme.entity.Location;
 import com.server.withme.entity.SafeZone;
+import com.server.withme.entity.TTL;
+import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.repository.InitSafeZoneRepository;
+import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexUtil;
 
 import lombok.RequiredArgsConstructor;
@@ -26,7 +30,7 @@ import lombok.RequiredArgsConstructor;
 public class VertexUtil implements IVertexUtil{
 	
 	private final InitSafeZoneRepository initSafeZoneRepository;
-	
+	private final ITTLService ttlService;
 	//4.23KM 기준으로 움직임
 	@Override
 	public Map<String,String> checkSafeZoneMinSize(List<VertexDto> initSafeZoneList) {
@@ -104,6 +108,21 @@ public class VertexUtil implements IVertexUtil{
 	}
 	
 	@Override
+	public List<SafeZone> convertInitSafeZoneToSafeZone(List<InitSafeZone> initSafeZoneList){
+		List<SafeZone> safeZoneListChanged = new ArrayList<>();
+		for(InitSafeZone initSafeZone : initSafeZoneList) {
+			
+			SafeZone vertexDto = SafeZone.builder()
+				.latitude(initSafeZone.getLatitude())
+				.longitude(initSafeZone.getLongitude()).build();
+		
+			safeZoneListChanged.add(vertexDto);
+		}
+		return safeZoneListChanged;
+	}
+
+	
+	@Override
 	public List<VertexDto> calculateVertex(List<VertexDto> initSafeZoneList){
 		
 		List<VertexDto> safeZoneList = new ArrayList<>();
@@ -129,25 +148,91 @@ public class VertexUtil implements IVertexUtil{
 	}
 	
 	@Override
-	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList){
+	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList,AccountOption accountOption){
 		List<SafeZone> deleteSafeZoneList = new ArrayList<>();
+		List<InitSafeZone> initSafeZoneList= initSafeZoneRepository.findByJoinFetch(accountOption.getId());
+		List<SafeZone> initSafeZoneListChanged = convertInitSafeZoneToSafeZone(initSafeZoneList);
 		
 		for(int idx=0; idx<safeZoneList.size(); idx+=4)
-			deleteSafeZoneList.addAll(this.vertifyInAndOut(safeZoneList.subList(idx, idx+4)));
-
+			deleteSafeZoneList.addAll(this.checkInAndOutInitSafeSone(safeZoneList.subList(idx, idx+4), initSafeZoneListChanged));			
+		
 		return deleteSafeZoneList;
 	}
 	
 	@Override
-	public List<SafeZone> vertifyInAndOut(List<SafeZone> safeZoneSubList){
-		List<SafeZone> deleteSafeZoneList = new ArrayList<>();
+	public int[] checkInAndOut(SafeZone target, List<SafeZone> totalSafeZoneList){
+		int[] result = new int[2];
 		
-		for(SafeZone checkTarget : safeZoneSubList) {
-			for(int idx=0; idx<4; idx++) {
-				int prev = checkTarget[];
-				int next = ;
+		for(int idx=0; idx<totalSafeZoneList.size(); idx++) {
+			SafeZone prev = totalSafeZoneList.get(totalSafeZoneList.size()-1);
+			SafeZone next = totalSafeZoneList.get(0);
+			if(idx==0) {
+				prev = totalSafeZoneList.get(idx-1);
+				next = totalSafeZoneList.get(idx);	
+			}
+					
+	        if ((next.getLongitude() < target.getLongitude() && prev.getLongitude() >= target.getLongitude()) || 
+	             (prev.getLongitude() < target.getLongitude() && next.getLongitude() >= target.getLongitude()))
+	            if (next.getLatitude()+(target.getLongitude()-next.getLongitude()) / 
+	               (prev.getLongitude()-next.getLongitude()) * (prev.getLatitude()-next.getLatitude()) < target.getLatitude()) {
+	                   result[0] = 1;
+	                   result[1] += 1;
+	                 }          			
+		}
+		return result;
+	}
+	
+	@Override
+	public List<SafeZone> checkInAndOutInitSafeSone(List<SafeZone> targetList, List<SafeZone> totalSafeZoneList){
+		List<SafeZone> deleteSafeZoneList = new ArrayList<>();
+		int countVertex=0;
+		int status = 0;
+		
+		for(SafeZone target : targetList) {
+			
+			int [] result = this.checkInAndOut(target,totalSafeZoneList);
+			
+			countVertex++;
+			status = result[0];
+			
+			if (status != 1 || result[1] % 2 == 0)  status=2;
+            if (status == 1) break;
+            
+			if(countVertex % 4 == 0) {
+				if (status == 2) deleteSafeZoneList.addAll(targetList);
+	            status = 0;
+				}
+			}
+		return deleteSafeZoneList;
+	}
+
+	@Override
+	public List<SafeZone> checkInAndOutLocation(SafeZone target, List<List<SafeZone>> totalSafeZoneList,List<TTL> ttlList){
+		List<SafeZone> safeZoneList = new ArrayList<>();
+		int status = 0;
+		int countVertex=0;
+		for(List<SafeZone> totalSafeZone: totalSafeZoneList) {
+
+			int[] result = checkInAndOut(target, totalSafeZone);
+			countVertex++;
+			status = result[0];
+			int count= result[1];
+			
+            if (count % 2 == 0) status=2;
+            if (status == 1) {
+            	ttlService.ttlUpdate(ttlList.get(countVertex),countVertex);
 			}
 		}
-		return deleteSafeZoneList;
+		//signing
+		safeZoneList.add(SafeZone.builder().latitude((double) status).build());
+		return safeZoneList;
+	}
+	
+	@Override
+	public Boolean checkLatestLocation(LocationDto locationDto,Location location) {
+		if(Math.abs(location.getLatitude() - locationDto.getVertexDto().getLatitude()) < 0.00001 && 
+				Math.abs(location.getLongitude() - locationDto.getVertexDto().getLongitude()) < 0.00001)
+					return false;
+		return true;
 	}
 }

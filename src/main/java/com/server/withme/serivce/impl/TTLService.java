@@ -2,7 +2,9 @@ package com.server.withme.serivce.impl;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.server.withme.entity.AccountOption;
@@ -44,5 +46,17 @@ public class TTLService implements ITTLService{
 						.ttl(Timestamp.valueOf(sdf.format(Timestamp)))
 						.accountOption(accountOption).build());
 		}
+	}
+	
+	@Override
+	public void ttlUpdate(TTL ttl, int index) {
+		TTL ttlOld = ttlRepository.findById(index).orElseThrow(() 
+        		-> new UsernameNotFoundException("not found"));
+		
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(ttlOld.getTtl());
+		cal.add(Calendar.DATE, 1);
+		ttlOld.getTtl().setTime(cal.getTime().getTime());
+		ttlRepository.save(ttlOld);
 	}
 }
