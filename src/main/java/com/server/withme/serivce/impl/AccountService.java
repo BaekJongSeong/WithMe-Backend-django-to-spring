@@ -95,8 +95,8 @@ public class AccountService implements IAccountService {
 	    	return account;
 	    }
 	    
-	    @Override
-	    public Account findByUsernameOrThrow(String username){
+	 @Override
+	 public Account findByUsernameOrThrow(String username){
 	    	Account account = accountRepository.findByUsername(username).orElseThrow(() 
 	        		-> new UsernameNotFoundException("not found username : " + username));
 	    	

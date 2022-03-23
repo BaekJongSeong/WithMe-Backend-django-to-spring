@@ -2,6 +2,7 @@ package com.server.withme.serivce.impl;
 
 import java.util.UUID;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.server.withme.entity.Account;
@@ -55,9 +56,11 @@ public class AccountOptionService implements IAccountOptionService{
 		return accountOptionRepository.save(accountOption);
 	}
 	
+	//accountOption을 알고싶으면 => fetch join하면 account찾아서 내부 ref 객체로 AccountOption 있으니까 꺼내쓰면 되지
 	@Override
 	public AccountOption findByAccountIdOrThrow(UUID accountId) {
-		Account account = accountRepository.findByJoinFetch(accountId);
+		Account account = accountRepository.findByFetchAccountOption(accountId).orElseThrow(() 
+        		-> new UsernameNotFoundException("not found user"));
 	
 		return account.getAccountOption();
 	}

@@ -9,6 +9,4 @@ import com.server.withme.entity.InitSafeZone;
 
 public interface InitSafeZoneRepository extends JpaRepository<InitSafeZone, Integer>{
 	
-	@Query("select c from AccountOption c left join fetch c.initSafeZoneList where c.id=?1")
-    List<InitSafeZone> findByJoinFetch(Integer id);
 }

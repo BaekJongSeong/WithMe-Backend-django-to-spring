@@ -9,9 +9,6 @@ import com.server.withme.entity.Location;
 
 public interface LocationRepository extends JpaRepository<Location, Integer>{
 
-	@Query("select c from AccountOption c left join fetch c.locationList where c.id=?1 and location.id = (SELECT max(id) FROM location)")
-    Location findByJoinFetchLatest(Integer id);
-	
-	@Query("select c from AccountOption c left join fetch c.locationList where c.id=?1")
-    List<Location> findByJoinFetch(Integer id);
+	@Query("select c from location c where location.id = (SELECT max(d.id) FROM location d WHERE d.accountOptionId=?1)")
+    Location findByFetchLatest(Integer id);
 }

@@ -1,5 +1,6 @@
 package com.server.withme.serivce;
 
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
@@ -16,4 +17,6 @@ public interface ILocationService {
 	public Map<String,Boolean> saveLocation(LocationDto locationDto, UUID accountId);
 	
 	public boolean checkInAndOut(LocationDto locationDto,AccountOption accountOption);
+	
+	public List<Location> findByAccountOptionIdOrThrow(Integer accountOptionId);
 }

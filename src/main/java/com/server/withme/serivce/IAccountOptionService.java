@@ -2,6 +2,8 @@ package com.server.withme.serivce;
 
 import java.util.UUID;
 
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
+
 import com.server.withme.entity.AccountOption;
 import com.server.withme.model.SignupDto;
 

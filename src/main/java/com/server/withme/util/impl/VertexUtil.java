@@ -16,6 +16,7 @@ import com.server.withme.entity.TTL;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.repository.InitSafeZoneRepository;
+import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexUtil;
 
@@ -28,14 +29,15 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class VertexUtil implements IVertexUtil{
+		
+	private final ISafeZoneService safeZoneService;
 	
-	private final InitSafeZoneRepository initSafeZoneRepository;
 	private final ITTLService ttlService;
+	
 	//4.23KM 기준으로 움직임
 	@Override
 	public Map<String,String> checkSafeZoneMinSize(List<VertexDto> initSafeZoneList) {
 		
-		int state = 0;
 		Map<String,String> result = new HashMap<>();
 		Map<String,Double> minMaxMap = findMinMaxVertex(initSafeZoneList);
 		result.put("maxLatitude", String.valueOf(minMaxMap.get("maxLatitude")));
@@ -67,7 +69,7 @@ public class VertexUtil implements IVertexUtil{
 	@Override
 	public Integer countSafeZone(AccountOption accountOption) {
 		
-		List<InitSafeZone> initSafeZoneList= initSafeZoneRepository.findByJoinFetch(accountOption.getId());
+		List<InitSafeZone> initSafeZoneList= safeZoneService.findByAccountOptionIdOrThrow(accountOption.getId());
 		List<VertexDto> initSafeZoneListChanged = this.convertInitSafeZoneToVertexDto(initSafeZoneList);
 		
 		Map<String,Double> minMaxMap = this.findMinMaxVertex(initSafeZoneListChanged);
@@ -150,7 +152,7 @@ public class VertexUtil implements IVertexUtil{
 	@Override
 	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList,AccountOption accountOption){
 		List<SafeZone> deleteSafeZoneList = new ArrayList<>();
-		List<InitSafeZone> initSafeZoneList= initSafeZoneRepository.findByJoinFetch(accountOption.getId());
+		List<InitSafeZone> initSafeZoneList= safeZoneService.findByAccountOptionIdOrThrow(accountOption.getId());
 		List<SafeZone> initSafeZoneListChanged = convertInitSafeZoneToSafeZone(initSafeZoneList);
 		
 		for(int idx=0; idx<safeZoneList.size(); idx+=4)
@@ -221,6 +223,7 @@ public class VertexUtil implements IVertexUtil{
             if (count % 2 == 0) status=2;
             if (status == 1) {
             	ttlService.ttlUpdate(ttlList.get(countVertex),countVertex);
+            	break;
 			}
 		}
 		//signing

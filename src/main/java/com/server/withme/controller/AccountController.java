@@ -37,7 +37,9 @@ import lombok.RequiredArgsConstructor;
 public class AccountController {
 
     private final IAccountService accountService;
+    
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
+    
     private final TokenProvider tokenProvider;
 
     @PostMapping("/sign")
