@@ -14,9 +14,13 @@ import com.server.withme.model.LocationDto;
  */
 public interface ILocationService {
 
-	public Map<String,Boolean> saveLocation(LocationDto locationDto, UUID accountId);
+	public boolean checkLatestLocation(LocationDto locationDto , UUID accountId);
 	
-	public boolean checkInAndOut(LocationDto locationDto,AccountOption accountOption);
+	public boolean saveLocation(LocationDto locationDto, UUID accountId);
+	
+	public boolean createSafeZoneByLocation(LocationDto locationDto, UUID accountId);
+	
+	public Map<String,Boolean> checkInAndOut(LocationDto locationDto, UUID accountId);
 	
 	public List<Location> findByAccountOptionIdOrThrow(Integer accountOptionId);
 }

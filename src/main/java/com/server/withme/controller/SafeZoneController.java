@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.InitSafeZoneDto;
 import com.server.withme.model.SafeZoneInfoDto;
 import com.server.withme.serivce.ISafeZoneService;
@@ -54,11 +55,11 @@ public class SafeZoneController {
         		.message("safe zone을 분할하여 전체 등록에 성공하였습니다").build(),new HttpHeaders(),HttpStatus.OK);
     }
 	
-	@DeleteMapping("/safe-zone-first/{accountId}")
+	@DeleteMapping("/safe-zone-first")
     public ResponseEntity<SafeZoneInfoDto> deleteSafeZoneFirst (
-            @PathVariable UUID accountId
+    		@Validated @RequestBody AccountIdDto accountIdDto
     ) {
-		safeZoneService.deleteSafeZoneFirst(accountId);
+		safeZoneService.deleteSafeZoneFirst(accountIdDto.getAccountId());
         return new ResponseEntity<>(SafeZoneInfoDto.builder()
         		.message("safe zone을 유저 맞춤형으로 정교화하였습니다").build(),new HttpHeaders(),HttpStatus.OK);
     }

@@ -45,39 +45,38 @@ public class LocationService implements ILocationService{
 	
 	private final AccountOptionRepository accountOptionRepository;
 	
-	
 	@Override
-	public Map<String,Boolean> saveLocation(LocationDto locationDto, UUID accountId) {
-		
-		Map<String,Boolean> map = new HashMap<>();
+	public boolean checkLatestLocation(LocationDto locationDto , UUID accountId) {
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		Location location = locationRepository.findByFetchLatest(accountOption.getId());
+		return vertexUtil.checkLatestLocation(locationDto,location);
+	}
+	
+	@Override
+	public boolean saveLocation(LocationDto locationDto, UUID accountId) {
 		
-		if(!vertexUtil.checkLatestLocation(locationDto,location)) {
-			map.put("latest", false);
-			return map;
-		}
-		locationRepository.save(Location.builder()
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+		Location location =Location.builder()
 					.timestamp(locationDto.getTimestamp())
 					.latitude(locationDto.getVertexDto().getLatitude())
 					.longitude(locationDto.getVertexDto().getLongitude())
 					.accountOption(accountOption)
-					.build());
+					.build();
 		
-		if(this.checkInAndOut(locationDto,accountOption))
-			map.put("inAndOut", true);
-		else
-			map.put("inAndOut", false);
+		if(!this.checkLatestLocation(locationDto,accountId))
+			return false;
 		
-		map.put("latest", true);
-		return	map;
+		locationRepository.save(location);
+		return true;
 	}
 	
 	@Override
-	public boolean checkInAndOut(LocationDto locationDto,AccountOption accountOption) {
-		
+	public Map<String,Boolean> checkInAndOut(LocationDto locationDto, UUID accountId) {
+		Map<String,Boolean> map = new HashMap<>();
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
 		List<List<SafeZone>> totalSafeZoneList = new ArrayList<>();
+		
 		for(TTL ttl : ttlList) 
 			totalSafeZoneList.add(safeZoneService.findByTTLIdOrThrow(ttl.getId()));
 		
@@ -89,9 +88,11 @@ public class LocationService implements ILocationService{
 		System.out.println("result: "+result +": "+ safeZoneList.toString());
 		
 		if(result==1.0)
-			return true;
+			map.put("inAndOut", true);
+		else
+			map.put("inAndOut", false);
 		
-		return false;
+		return map;
 	}
 	
 	@Override
@@ -100,5 +101,10 @@ public class LocationService implements ILocationService{
         		-> new UsernameNotFoundException("not found accountOption"));
 	
 		return accountOption.getLoctionList();
+	}
+	
+	@Override
+	public boolean createSafeZoneByLocation(LocationDto locationDto, UUID accountId) {
+		
 	}
 }

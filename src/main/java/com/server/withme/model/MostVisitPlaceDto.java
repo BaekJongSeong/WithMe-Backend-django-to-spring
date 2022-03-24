@@ -23,5 +23,5 @@ public class MostVisitPlaceDto {
     private String place;
 
     @NotNull
-    private VertexDto vertexDto;
+	private SafeZoneDto safeZoneDto;
 }

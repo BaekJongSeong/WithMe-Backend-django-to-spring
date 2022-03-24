@@ -13,9 +13,9 @@ import com.server.withme.model.AccountIdDto;
  */
 public interface ITTLService {
 	
-	public void saveTTL(AccountIdDto accountIdDto);
+	public TTL saveTTL(AccountIdDto accountIdDto);
 	
-	public void ttlUpdate(TTL ttl, int index);
+	public TTL ttlUpdate(TTL ttl, int index);
 	
 	public Timestamp calculateTimestamp(Date timestamp, int index);
 	

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.server.withme.entity.SafeZone;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.SafeZoneInfoDto;
 import com.server.withme.serivce.ILocationService;
@@ -34,17 +35,36 @@ public class LocationController {
 	@PostMapping("/location/{accountId}")
     public ResponseEntity<SafeZoneInfoDto> saveLocation (
     		@PathVariable UUID accountId,
-            @Validated @RequestBody LocationDto locationdto
+            @Validated @RequestBody LocationDto locationDto
     ) {
 		SafeZoneInfoDto safeZoneInfoDto = new SafeZoneInfoDto();
-		Map<String,Boolean> map = locationService.saveLocation(locationdto,accountId);
-		if(map.get("latest")) {
-			if(map.get("inAndOut"))
-				safeZoneInfoDto.setMessage("location에 해당하는 safeZone의 TTL이 저장되었습니다.");
-			else
-				safeZoneInfoDto.setMessage("새로운 safeZone이 생성되었습니다.");
-		} else
+		if(locationService.saveLocation(locationDto,accountId))
+			safeZoneInfoDto.setMessage("location이 저장되었습니다.");
+		else
 			safeZoneInfoDto.setMessage("현재 location은 중복으로 변동이 없어 저장되지 못하였습니다.");
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
-		}
+	}
+	
+	@PostMapping("/location-in-out/{accountId}")
+    public ResponseEntity<SafeZoneInfoDto> checkLocationInAndOut (
+    		@PathVariable UUID accountId,
+            @Validated @RequestBody LocationDto locationDto
+    ) {
+		SafeZoneInfoDto safeZoneInfoDto = new SafeZoneInfoDto();
+		Map<String,Boolean> map = locationService.checkInAndOut(locationDto,accountId);
+			if(map.get("inAndOut"))
+				safeZoneInfoDto.setMessage("location에 해당하는 safeZone의 TTL이 업데이트 되었습니다.");
+			else
+				safeZoneInfoDto.setMessage("새로운 safeZone이 생성되었습니다.");
+		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
+	}
+	
+	@PostMapping("/location-in-out/{accountId}")
+    public ResponseEntity<SafeZone> createSafeZoneByLocation (
+    		@PathVariable UUID accountId,
+            @Validated @RequestBody LocationDto locationDto
+    ) {
+		locationService.createSafeZoneByLocation(locationDto,accountId);
+		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
+	}
 }

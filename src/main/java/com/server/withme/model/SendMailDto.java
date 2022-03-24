@@ -21,5 +21,5 @@ public class SendMailDto {
     private UUID accountId;
 
     @NotNull
-    String email;
+    private String email;
 }
