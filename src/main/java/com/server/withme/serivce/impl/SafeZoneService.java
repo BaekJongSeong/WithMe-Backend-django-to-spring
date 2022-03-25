@@ -120,13 +120,16 @@ public class SafeZoneService implements ISafeZoneService{
 	@Override
 	public List<VertexDto> createSafeZoneByLocation(UUID accountId,LocationDto locationDto){
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
-		ttlService.saveTTL(accountOption);
-		List<SafeZone> newSafeZoneList = vertexUtil.createSafeZoneByLocation(accountOption);
+		TTL ttl = ttlService.saveTTL(accountOption);
+		List<VertexDto> newSafeZoneList = vertexUtil.createSafeZoneByLocation(accountOption,locationDto);
 		
-		for(SafeZone safeZone: newSafeZoneList)
-			safeZoneRepository.save(safeZone);
+		for(VertexDto safeZone: newSafeZoneList)
+			safeZoneRepository.save(SafeZone.builder()
+					.latitude(safeZone.getLatitude())
+					.longitude(safeZone.getLongitude())
+					.ttl(ttl).build());	
 		
-		return vertexUtil.convertSafeZoneToVertexDto(newSafeZoneList);
+		return newSafeZoneList;
 	}
 	
 	@Override

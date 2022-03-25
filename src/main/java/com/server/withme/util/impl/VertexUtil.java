@@ -139,6 +139,14 @@ public class VertexUtil implements IVertexUtil{
 		return safeZoneListChanged;
 	}
 
+	@Override
+	public List<VertexDto> createNewSafeZone(List<VertexDto> safeZoneList, double x, double y, double perBoxSize) {
+		safeZoneList.add(new VertexDto(x , y));
+		safeZoneList.add(new VertexDto(x , y + perBoxSize));
+		safeZoneList.add(new VertexDto(x - perBoxSize , y + perBoxSize));
+		safeZoneList.add(new VertexDto(x - perBoxSize , y));
+		return safeZoneList;
+	}
 	
 	@Override
 	public List<VertexDto> calculateVertex(List<VertexDto> initSafeZoneList){
@@ -154,13 +162,60 @@ public class VertexUtil implements IVertexUtil{
 			Double y=minMaxMap.get("minLongitude");
 			
 			while(y < minMaxMap.get("maxLongitude")) {
-				safeZoneList.add(new VertexDto(x , y));
-				safeZoneList.add(new VertexDto(x , y + perBoxSize));
-				safeZoneList.add(new VertexDto(x - perBoxSize , y + perBoxSize));
-				safeZoneList.add(new VertexDto(x - perBoxSize , y));
+				createNewSafeZone(safeZoneList,x,y,perBoxSize);
 				y += perBoxSize;
 			}
 			x += perBoxSize;
+		}
+		return safeZoneList;
+	}
+	
+	@Override
+	public List<VertexDto> createSafeZoneByLocation(AccountOption accountOption, LocationDto locationDto) {
+		List<VertexDto> safeZoneList = new ArrayList<>();
+		Double perBoxSize = (double) (100/100000);
+			
+		if(accountOption.getXPoint() < locationDto.getVertexDto().getLatitude()) {
+			Double x= accountOption.getXPoint();
+			while(x > locationDto.getVertexDto().getLatitude())
+				x += perBoxSize;
+				
+			if(accountOption.getYPoint() > locationDto.getVertexDto().getLongitude()) {
+				Double y=accountOption.getYPoint();
+				while(y < locationDto.getVertexDto().getLongitude())
+						y -= perBoxSize;
+						
+				createNewSafeZone(safeZoneList,x,y,perBoxSize);
+			}
+				
+			else {
+				Double y=accountOption.getYPoint();
+				while(y < locationDto.getVertexDto().getLongitude())
+						y += perBoxSize;
+						
+				createNewSafeZone(safeZoneList,x,y,perBoxSize);
+			}
+		}
+		else {
+			Double x= accountOption.getXPoint();
+			while(x > locationDto.getVertexDto().getLatitude())
+				x -= perBoxSize;
+				
+			if(accountOption.getYPoint() > locationDto.getVertexDto().getLongitude()) {
+				Double y=accountOption.getYPoint();
+				while(y < locationDto.getVertexDto().getLongitude())
+						y -= perBoxSize;
+						
+				createNewSafeZone(safeZoneList,x,y,perBoxSize);
+			}
+				
+			else {
+				Double y=accountOption.getYPoint();
+				while(y < locationDto.getVertexDto().getLongitude())
+						y += perBoxSize;
+						
+				createNewSafeZone(safeZoneList,x,y,perBoxSize);
+			}
 		}
 		return safeZoneList;
 	}
@@ -253,10 +308,5 @@ public class VertexUtil implements IVertexUtil{
 				Math.abs(location.getLongitude() - locationDto.getVertexDto().getLongitude()) < 0.00001)
 					return false;
 		return true;
-	}
-	
-	@Override
-	public public List<SafeZone> createSafeZoneByLocation(AccountOption accountOption){
-		
 	}
 }

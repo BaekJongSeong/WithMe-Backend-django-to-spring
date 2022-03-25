@@ -72,7 +72,7 @@ public class SafeZoneController {
             @PathVariable UUID accountId,
             @Validated @RequestBody LocationDto locationDto
     ) {
-		List<VertexDto> safeZone = safeZoneService.createSafeZoneByLocation(locationDto,accountId);
+		List<VertexDto> safeZone = safeZoneService.createSafeZoneByLocation(accountId,locationDto);
 		return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(safeZone).build(),new HttpHeaders(),HttpStatus.OK);
     }
