@@ -15,7 +15,6 @@ import com.server.withme.entity.SafeZone;
 import com.server.withme.entity.TTL;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
-import com.server.withme.repository.InitSafeZoneRepository;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexUtil;
@@ -120,6 +119,23 @@ public class VertexUtil implements IVertexUtil{
 		
 			safeZoneListChanged.add(vertexDto);
 		}
+		return safeZoneListChanged;
+	}
+	
+	@Override
+	public List<VertexDto> convertSafeZoneToVertexDto(List<SafeZone> safeZoneList){
+		
+		List<VertexDto> safeZoneListChanged = new ArrayList<>();
+		
+		for(SafeZone initSafeZone : safeZoneList) {
+			
+			VertexDto vertexDto = VertexDto.builder()
+				.latitude(initSafeZone.getLatitude())
+				.longitude(initSafeZone.getLongitude()).build();
+		
+			safeZoneListChanged.add(vertexDto);
+		}
+		
 		return safeZoneListChanged;
 	}
 
@@ -237,5 +253,10 @@ public class VertexUtil implements IVertexUtil{
 				Math.abs(location.getLongitude() - locationDto.getVertexDto().getLongitude()) < 0.00001)
 					return false;
 		return true;
+	}
+	
+	@Override
+	public public List<SafeZone> createSafeZoneByLocation(AccountOption accountOption){
+		
 	}
 }

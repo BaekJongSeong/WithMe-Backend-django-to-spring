@@ -54,11 +54,7 @@ public class AccountController {
             @Validated @RequestBody AccountIdDto accountIdDto
     ) {
     	Account account = accountService.modifyAccount(accountIdDto);
-    	AccountDto accountDto = AccountDto.builder()
-							    .timestamp(account.getTimestamp())
-							    .name(account.getName())
-							    .emailVerified(account.getEmailVerified())
-							    .accountType(account.getAccountType()).build();
+    	AccountDto accountDto =accountService.createAccountDto(account);
         return new ResponseEntity<>(accountDto,new HttpHeaders(),HttpStatus.OK);
     }
     

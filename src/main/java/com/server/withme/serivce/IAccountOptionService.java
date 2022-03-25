@@ -1,10 +1,8 @@
 package com.server.withme.serivce;
 
 import java.util.UUID;
-
-import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException;
-
 import com.server.withme.entity.AccountOption;
+import com.server.withme.model.AccountOptionDto;
 import com.server.withme.model.SignupDto;
 
 /**
@@ -17,6 +15,8 @@ public interface IAccountOptionService {
 	public AccountOption signUpOption(SignupDto signupDto);
 	
 	public AccountOption updateAccountOption(UUID accountId, Double latitude, Double longitude);
+	
+	public AccountOptionDto createAccountOptionDto(AccountOption accountOption);
 	
 	public AccountOption findByAccountIdOrThrow(UUID accountId);
 }

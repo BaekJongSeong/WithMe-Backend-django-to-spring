@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.server.withme.entity.Account;
 import com.server.withme.entity.AccountOption;
+import com.server.withme.model.AccountOptionDto;
 import com.server.withme.model.SignupDto;
 import com.server.withme.repository.AccountOptionRepository;
 import com.server.withme.repository.AccountRepository;
@@ -56,6 +57,17 @@ public class AccountOptionService implements IAccountOptionService{
 		return accountOptionRepository.save(accountOption);
 	}
 	
+	@Override
+	public AccountOptionDto createAccountOptionDto(AccountOption accountOption) {
+		return AccountOptionDto.builder()
+			.id(accountOption.getId())
+			.boxSize(accountOption.getBoxSize())
+			.distance(accountOption.getDistance())
+			.xPoint(accountOption.getXPoint())
+			.yPoint(accountOption.getYPoint())
+			.accountId(accountOption.getAccount().getAccountId())
+			.build();
+	}
 	//accountOption을 알고싶으면 => fetch join하면 account찾아서 내부 ref 객체로 AccountOption 있으니까 꺼내쓰면 되지
 	@Override
 	public AccountOption findByAccountIdOrThrow(UUID accountId) {

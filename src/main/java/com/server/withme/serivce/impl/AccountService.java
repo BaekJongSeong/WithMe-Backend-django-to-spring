@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.server.withme.entity.Account;
+import com.server.withme.model.AccountDto;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LoginDto;
 import com.server.withme.model.SignupDto;
@@ -87,19 +88,28 @@ public class AccountService implements IAccountService {
 				.accountId(account.getAccountId()).build();
 	}
 	
-	 @Override
-	    public Account findByAccountIdOrThrow(UUID accountId){
-	    	Account account = accountRepository.findByAccountId(accountId).orElseThrow(() 
+	@Override
+	public AccountDto createAccountDto(Account account) {
+		return AccountDto.builder()
+			    .timestamp(account.getTimestamp())
+			    .name(account.getName())
+			    .emailVerified(account.getEmailVerified())
+			    .accountType(account.getAccountType()).build();
+	}
+	
+	@Override
+	public Account findByAccountIdOrThrow(UUID accountId){
+	    Account account = accountRepository.findByAccountId(accountId).orElseThrow(() 
 	        		-> new UsernameNotFoundException("not found user"));
 	    	
-	    	return account;
-	    }
+	    return account;
+	}
 	    
-	 @Override
-	 public Account findByUsernameOrThrow(String username){
-	    	Account account = accountRepository.findByUsername(username).orElseThrow(() 
+	@Override
+	public Account findByUsernameOrThrow(String username){
+		Account account = accountRepository.findByUsername(username).orElseThrow(() 
 	        		-> new UsernameNotFoundException("not found username : " + username));
 	    	
-	    	return account;
-	    }
+	    return account;
+	}
 }

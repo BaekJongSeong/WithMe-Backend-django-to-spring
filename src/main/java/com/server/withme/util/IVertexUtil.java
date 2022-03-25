@@ -23,6 +23,8 @@ public interface IVertexUtil {
 	
 	public List<SafeZone> convertInitSafeZoneToSafeZone(List<InitSafeZone> initSafeZoneList);
 	
+	public List<VertexDto> convertSafeZoneToVertexDto(List<SafeZone> initSafeZoneList);
+	
 	public List<VertexDto> calculateVertex(List<VertexDto> initSafeZoneList);
 	
 	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList,AccountOption accountOption);
@@ -34,4 +36,6 @@ public interface IVertexUtil {
 	public List<SafeZone> checkInAndOutLocation(SafeZone target, List<List<SafeZone>> totalSafeZoneList, List<TTL> ttlList);
 
 	public Boolean checkLatestLocation(LocationDto locationDto,Location location);
+	
+	public List<SafeZone> createSafeZoneByLocation(AccountOption accountOption);
 }

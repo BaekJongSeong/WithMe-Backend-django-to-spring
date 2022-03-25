@@ -1,5 +1,7 @@
 package com.server.withme.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
@@ -13,9 +15,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.server.withme.entity.SafeZone;
 import com.server.withme.model.AccountIdDto;
-import com.server.withme.model.InitSafeZoneDto;
+import com.server.withme.model.LocationDto;
+import com.server.withme.model.SafeZoneDto;
 import com.server.withme.model.SafeZoneInfoDto;
+import com.server.withme.model.VertexDto;
 import com.server.withme.serivce.ISafeZoneService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,36 +37,45 @@ public class SafeZoneController {
 
 	private final ISafeZoneService safeZoneService;
 	
-	@PostMapping("/init-safe-zone/{accountId}")
-    public ResponseEntity<SafeZoneInfoDto> saveInitSafeZone (
+	@PostMapping("/safe-zone/init/{accountId}")
+    public ResponseEntity<SafeZoneInfoDto<VertexDto>> saveInitSafeZone (
             @PathVariable UUID accountId,
-            @Validated @RequestBody InitSafeZoneDto initSafeZoneDto
+            @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
-		SafeZoneInfoDto safeZoneInfoDto = new SafeZoneInfoDto();
-		if(safeZoneService.saveInitSafeZone(initSafeZoneDto, accountId))
-			safeZoneInfoDto.setMessage("safe zone 등록이 완료되었습니다.");
-		else
-			safeZoneInfoDto.setMessage("safe zone 최소 size를 위반하여 등록되지 않았습니다.");
-			return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
+		List<VertexDto> safeZoneList = safeZoneService.saveInitSafeZone(safeZoneDto, accountId);
+		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService
+				.craeteSafeZoneInfoDto(safeZoneList, safeZoneList.remove(safeZoneList.size()-1).getLatitude());
+		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
     }
 	
 	@PostMapping("/safe-zone/{accountId}")
-    public ResponseEntity<SafeZoneInfoDto> saveSafeZone (
+    public ResponseEntity<SafeZoneDto> saveSafeZone (
             @PathVariable UUID accountId,
-            @Validated @RequestBody InitSafeZoneDto initSafeZoneDto
+            @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
-		safeZoneService.saveSafeZone(initSafeZoneDto,accountId);
-        return new ResponseEntity<>(SafeZoneInfoDto.builder()
-        		.message("safe zone을 분할하여 전체 등록에 성공하였습니다").build(),new HttpHeaders(),HttpStatus.OK);
+		List<VertexDto> safeZoneList= safeZoneService.saveSafeZoneFirstTime(safeZoneDto,accountId);
+        return new ResponseEntity<>(SafeZoneDto.builder()
+        		.safeZone(safeZoneList).build(),new HttpHeaders(),HttpStatus.OK);
     }
 	
-	@DeleteMapping("/safe-zone-first")
-    public ResponseEntity<SafeZoneInfoDto> deleteSafeZoneFirst (
+	@DeleteMapping("/safe-zone/first")
+    public ResponseEntity<SafeZoneDto> deleteSafeZoneFirst (
     		@Validated @RequestBody AccountIdDto accountIdDto
     ) {
-		safeZoneService.deleteSafeZoneFirst(accountIdDto.getAccountId());
-        return new ResponseEntity<>(SafeZoneInfoDto.builder()
-        		.message("safe zone을 유저 맞춤형으로 정교화하였습니다").build(),new HttpHeaders(),HttpStatus.OK);
+		List<VertexDto> deleteSafeZoneList = safeZoneService.deleteSafeZoneFirstTime(accountIdDto.getAccountId());
+        return new ResponseEntity<>(SafeZoneDto.builder()
+        		.safeZone(deleteSafeZoneList).build(),new HttpHeaders(),HttpStatus.OK);
     }
+	
+	@PostMapping("/safe-zone/location/{accountId}")
+    public ResponseEntity<SafeZoneDto> createSafeZoneByLocation (
+            @PathVariable UUID accountId,
+            @Validated @RequestBody LocationDto locationDto
+    ) {
+		List<VertexDto> safeZone = safeZoneService.createSafeZoneByLocation(locationDto,accountId);
+		return new ResponseEntity<>(SafeZoneDto.builder()
+        		.safeZone(safeZone).build(),new HttpHeaders(),HttpStatus.OK);
+    }
+	
 	
 }

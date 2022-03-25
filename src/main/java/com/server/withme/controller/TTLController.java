@@ -9,8 +9,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.server.withme.entity.TTL;
 import com.server.withme.model.AccountIdDto;
-import com.server.withme.model.SafeZoneInfoDto;
+import com.server.withme.model.TTLDto;
 import com.server.withme.serivce.ITTLService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,12 @@ public class TTLController {
 private final ITTLService ttlService;
 	
 	@PostMapping("/ttl")
-    public ResponseEntity<SafeZoneInfoDto> saveTTL (
+    public ResponseEntity<TTLDto> saveTTL (
             @Validated @RequestBody AccountIdDto accountIdDto
     ) {
-		ttlService.saveTTL(accountIdDto);
-        return new ResponseEntity<>(SafeZoneInfoDto.builder()
-        		.message("safe zone 등록에 성공하였습니다").build(),new HttpHeaders(),HttpStatus.OK);
+		TTL ttl = ttlService.saveTTLFirstTime(accountIdDto);
+		TTLDto ttlDto = ttlService.createTTLDto(ttl);
+        return new ResponseEntity<>(ttlDto,new HttpHeaders(),HttpStatus.OK);
     }
 	
 }

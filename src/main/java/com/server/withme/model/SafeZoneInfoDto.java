@@ -1,6 +1,6 @@
 package com.server.withme.model;
 
-import java.util.Date;
+import java.util.List;
 
 import com.sun.istack.NotNull;
 
@@ -20,8 +20,11 @@ import lombok.Setter;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class SafeZoneInfoDto {
+public class SafeZoneInfoDto<T> {
 
 	@NotNull
 	private String message;
+	
+	@NotNull
+	private List<T> Data;
 }

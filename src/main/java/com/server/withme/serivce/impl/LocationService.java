@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.apache.tomcat.jni.Time;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -57,7 +58,7 @@ public class LocationService implements ILocationService{
 		
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		Location location =Location.builder()
-					.timestamp(locationDto.getTimestamp())
+					.timestamp(locationDto.getTtlDto().getTtl())
 					.latitude(locationDto.getVertexDto().getLatitude())
 					.longitude(locationDto.getVertexDto().getLongitude())
 					.accountOption(accountOption)
@@ -101,10 +102,5 @@ public class LocationService implements ILocationService{
         		-> new UsernameNotFoundException("not found accountOption"));
 	
 		return accountOption.getLoctionList();
-	}
-	
-	@Override
-	public boolean createSafeZoneByLocation(LocationDto locationDto, UUID accountId) {
-		
 	}
 }

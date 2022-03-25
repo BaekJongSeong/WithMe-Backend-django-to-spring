@@ -45,7 +45,7 @@ public class LocationController {
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
 	}
 	
-	@PostMapping("/location-in-out/{accountId}")
+	@PostMapping("/location/in-out/{accountId}")
     public ResponseEntity<SafeZoneInfoDto> checkLocationInAndOut (
     		@PathVariable UUID accountId,
             @Validated @RequestBody LocationDto locationDto
@@ -56,15 +56,6 @@ public class LocationController {
 				safeZoneInfoDto.setMessage("location에 해당하는 safeZone의 TTL이 업데이트 되었습니다.");
 			else
 				safeZoneInfoDto.setMessage("새로운 safeZone이 생성되었습니다.");
-		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
-	}
-	
-	@PostMapping("/location-in-out/{accountId}")
-    public ResponseEntity<SafeZone> createSafeZoneByLocation (
-    		@PathVariable UUID accountId,
-            @Validated @RequestBody LocationDto locationDto
-    ) {
-		locationService.createSafeZoneByLocation(locationDto,accountId);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
 	}
 }

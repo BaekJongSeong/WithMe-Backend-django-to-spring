@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.TTL;
 import com.server.withme.model.AccountIdDto;
+import com.server.withme.model.TTLDto;
 import com.server.withme.repository.AccountOptionRepository;
 import com.server.withme.repository.TTLRepository;
 import com.server.withme.serivce.IAccountOptionService;
@@ -37,7 +38,7 @@ public class TTLService implements ITTLService{
 	private final IVertexUtil vertexUtil;
 	
 	@Override
-	public TTL saveTTL(AccountIdDto accountIdDto) {
+	public TTL saveTTLFirstTime(AccountIdDto accountIdDto) {
 		
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
 		Integer count = vertexUtil.countSafeZone(accountOption);
@@ -53,6 +54,18 @@ public class TTLService implements ITTLService{
 			ttlRepository.save(ttl);
 		
 		return ttl;
+	}
+	
+	@Override 
+	public TTL saveTTL(AccountOption accountOption) {
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		timestamp = this.calculateTimestamp(timestamp, 1);
+		
+		TTL ttl = TTL.builder()
+				.ttl(timestamp)
+				.accountOption(accountOption).build();
+		
+		return ttlRepository.save(ttl);
 	}
 	
 	@Override
@@ -80,6 +93,13 @@ public class TTLService implements ITTLService{
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 		return Timestamp.valueOf(sdf.format(cal.getTime().getTime()));
+	}
+	
+	@Override
+	public TTLDto createTTLDto(TTL ttl) {
+		return TTLDto.builder()
+				.ttl(ttl.getTtl())
+				.build();
 	}
 	
 	@Override

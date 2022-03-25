@@ -15,6 +15,7 @@ import com.server.withme.entity.Account;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.SendMailDto;
 import com.server.withme.serivce.IAccountService;
+import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.IMailService;
 
 import lombok.RequiredArgsConstructor;

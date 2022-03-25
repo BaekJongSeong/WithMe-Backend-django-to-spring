@@ -1,9 +1,12 @@
 package com.server.withme.model;
 
-import java.util.Date;
-
 import com.sun.istack.NotNull;
-import lombok.*;
+
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * DTO for Location API
@@ -18,7 +21,7 @@ import lombok.*;
 public class LocationDto {
 	
 	@NotNull
-    private Date timestamp;  
+    private TTLDto ttlDto;  
 	
     @NotNull
     private VertexDto vertexDto;
