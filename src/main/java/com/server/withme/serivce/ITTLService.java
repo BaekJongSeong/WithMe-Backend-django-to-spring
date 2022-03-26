@@ -6,8 +6,8 @@ import java.util.List;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.TTL;
-import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.TTLDto;
+import com.server.withme.model.VertexDto;
 /**
  * Interface for TTLService
  *
@@ -15,13 +15,15 @@ import com.server.withme.model.TTLDto;
  */
 public interface ITTLService {
 	
-	public TTL saveTTLFirstTime(AccountIdDto accountIdDto);
+	public TTL saveTTLFirstTime(List<VertexDto> initSafeZoneList, AccountOption accountOption);
 	
 	public TTL saveTTL(AccountOption accountOption);
 	
 	public TTL ttlUpdate(TTL ttl, int index);
 	
 	public Timestamp calculateTimestamp(Date timestamp, int index);
+	
+	public void deleteAllTTL(List<TTL> ttlList);
 	
 	public TTLDto createTTLDto(TTL ttl);
 	

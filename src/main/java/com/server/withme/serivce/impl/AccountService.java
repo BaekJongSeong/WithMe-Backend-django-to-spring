@@ -2,6 +2,9 @@ package com.server.withme.serivce.impl;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetails;
@@ -54,12 +57,10 @@ public class AccountService implements IAccountService {
 	
 	@Override
 	public Account createAccount(SignupDto signupDto, String role) {
-		Timestamp Timestamp = new Timestamp(System.currentTimeMillis());
-		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
-
-	    @SuppressWarnings("static-access")
+		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+		
 		Account newAccount = Account.builder()
-	    			.timestamp(Timestamp.valueOf(sdf.format(Timestamp)))
+	    			.timestamp(timestamp)
 	                .username(signupDto.getLoginDto().getUsername())
 	                .password(passwordEncoder.encode(signupDto.getLoginDto().getPassword()))
 	                .name(signupDto.getName())
@@ -86,6 +87,28 @@ public class AccountService implements IAccountService {
 		
 		return AccountIdDto.builder()
 				.accountId(account.getAccountId()).build();
+	}
+	
+	@Override
+    public List<Account> findAllAccount(){
+		return accountRepository.findAll();
+	}
+	
+	@Override
+    public List<Account> checkSevenDayOver(List<Account> accountList){
+		List<Account> checkedAccountList = new ArrayList<>();
+		Calendar cal = Calendar.getInstance();
+		Calendar calStandard = Calendar.getInstance();
+		calStandard.setTime(new Timestamp(System.currentTimeMillis()));
+		
+		for(Account account : accountList) {
+			cal.setTime(account.getTimestamp());
+			cal.add(Calendar.DATE, 7);
+			
+			if(cal.getTime().getTime() < calStandard.getTime().getTime())
+				checkedAccountList.add(account);
+		}
+		return checkedAccountList;
 	}
 	
 	@Override

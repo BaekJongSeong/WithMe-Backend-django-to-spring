@@ -1,6 +1,5 @@
 package com.server.withme.controller;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.server.withme.entity.SafeZone;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.SafeZoneDto;
@@ -44,7 +42,7 @@ public class SafeZoneController {
     ) {
 		List<VertexDto> safeZoneList = safeZoneService.saveInitSafeZone(safeZoneDto, accountId);
 		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService
-				.craeteSafeZoneInfoDto(safeZoneList, safeZoneList.remove(safeZoneList.size()-1).getLatitude());
+				.craeteSafeZoneInfoDto(safeZoneList, safeZoneList.remove(safeZoneList.size()-1).getLatitude(),0);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
     }
 	

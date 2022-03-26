@@ -11,13 +11,12 @@ import org.springframework.stereotype.Service;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.TTL;
-import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.TTLDto;
+import com.server.withme.model.VertexDto;
 import com.server.withme.repository.AccountOptionRepository;
 import com.server.withme.repository.TTLRepository;
-import com.server.withme.serivce.IAccountOptionService;
 import com.server.withme.serivce.ITTLService;
-import com.server.withme.util.IVertexUtil;
+import com.server.withme.util.IVertexCheckUtil;
 
 import lombok.RequiredArgsConstructor;
 /**
@@ -28,32 +27,29 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class TTLService implements ITTLService{
-	
-	private final IAccountOptionService accountOptionService;
-	
+		
 	private final AccountOptionRepository accountOptionRepository;
 	
 	private final TTLRepository ttlRepository;
 	
-	private final IVertexUtil vertexUtil;
+	private final IVertexCheckUtil vertexCheckUtil;
+	
 	
 	@Override
-	public TTL saveTTLFirstTime(AccountIdDto accountIdDto) {
-		
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
-		Integer count = vertexUtil.countSafeZone(accountOption);
-		
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		timestamp = this.calculateTimestamp(timestamp, 7);
-		
-		TTL ttl = TTL.builder()
-				.ttl(timestamp)
-				.accountOption(accountOption).build();
-		
-		for(int idx=0; idx< count; idx++)
-			ttlRepository.save(ttl);
-		
-		return ttl;
+	public TTL saveTTLFirstTime(List<VertexDto> initSafeZoneList, AccountOption accountOption) {
+			Integer count = vertexCheckUtil.countSafeZone(initSafeZoneList);
+			
+			Timestamp timestamp = new Timestamp(System.currentTimeMillis());
+			timestamp = this.calculateTimestamp(timestamp, 7);
+			
+			TTL ttl = TTL.builder()
+					.ttl(timestamp)
+					.accountOption(accountOption).build();
+			
+			for(int idx=0; idx< count; idx++)
+				ttlRepository.save(ttl);
+			
+			return ttl;
 	}
 	
 	@Override 
@@ -93,6 +89,12 @@ public class TTLService implements ITTLService{
 		
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd hh:mm:ss");
 		return Timestamp.valueOf(sdf.format(cal.getTime().getTime()));
+	}
+	
+	@Override
+	public void deleteAllTTL(List<TTL> ttlList) {
+		for(TTL ttl : ttlList)
+			ttlRepository.delete(ttl);
 	}
 	
 	@Override

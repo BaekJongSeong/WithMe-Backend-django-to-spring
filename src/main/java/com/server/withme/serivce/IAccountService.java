@@ -1,4 +1,5 @@
 package com.server.withme.serivce;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,6 +25,10 @@ public interface IAccountService extends UserDetailsService {
     public Account modifyAccount(AccountIdDto accountIdDto);
     
     public AccountIdDto getAccountId(LoginDto loginDto);
+    
+    public List<Account> findAllAccount();
+    
+    public List<Account> checkSevenDayOver(List<Account> accountList);
     
     public AccountDto createAccountDto(Account account);
 

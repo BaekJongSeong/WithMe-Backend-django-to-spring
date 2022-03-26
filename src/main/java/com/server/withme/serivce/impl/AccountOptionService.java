@@ -1,5 +1,7 @@
 package com.server.withme.serivce.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -58,11 +60,30 @@ public class AccountOptionService implements IAccountOptionService{
 	}
 	
 	@Override
+	public AccountOption updateSafeMove(UUID accountId) {
+		AccountOption accountOption = this.findByAccountIdOrThrow(accountId);
+		accountOption.setSafeMove(true);
+		return accountOptionRepository.save(accountOption);
+	}
+	
+	@Override
+	public List<AccountOption> findAllFetchAccountOption(List<Account> checkedAccountList){
+		List<AccountOption> AccountOptionList = new ArrayList<>();
+		
+		for(Account account : checkedAccountList) 
+			AccountOptionList.add(this.findByAccountIdOrThrow(account.getAccountId()));
+		
+		return AccountOptionList;
+	}
+	
+	@Override
 	public AccountOptionDto createAccountOptionDto(AccountOption accountOption) {
 		return AccountOptionDto.builder()
 			.id(accountOption.getId())
 			.boxSize(accountOption.getBoxSize())
 			.distance(accountOption.getDistance())
+			.initSafeZone(accountOption.getInitSafeZone())
+			.safeMove(accountOption.getSafeMove())
 			.xPoint(accountOption.getXPoint())
 			.yPoint(accountOption.getYPoint())
 			.accountId(accountOption.getAccount().getAccountId())

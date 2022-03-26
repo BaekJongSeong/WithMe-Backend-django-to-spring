@@ -1,12 +1,9 @@
 package com.server.withme.serivce.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-import org.apache.tomcat.jni.Time;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
@@ -15,13 +12,14 @@ import com.server.withme.entity.Location;
 import com.server.withme.entity.SafeZone;
 import com.server.withme.entity.TTL;
 import com.server.withme.model.LocationDto;
+import com.server.withme.model.VertexDto;
 import com.server.withme.repository.AccountOptionRepository;
 import com.server.withme.repository.LocationRepository;
 import com.server.withme.serivce.IAccountOptionService;
 import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.serivce.ITTLService;
-import com.server.withme.util.IVertexUtil;
+import com.server.withme.util.IVertexCheckUtil;
 
 import lombok.RequiredArgsConstructor;
 /**
@@ -33,9 +31,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class LocationService implements ILocationService{
-	
-	private final IVertexUtil vertexUtil;
-	
+		
 	private final LocationRepository locationRepository;
 	
 	private final ITTLService ttlService;
@@ -45,17 +41,20 @@ public class LocationService implements ILocationService{
 	private final IAccountOptionService accountOptionService;
 	
 	private final AccountOptionRepository accountOptionRepository;
+
+	private final IVertexCheckUtil vertexCheckUtil;
 	
 	@Override
 	public boolean checkLatestLocation(LocationDto locationDto , UUID accountId) {
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		Location location = locationRepository.findByFetchLatest(accountOption.getId());
-		return vertexUtil.checkLatestLocation(locationDto,location);
+		return vertexCheckUtil.checkLatestLocation(locationDto,location);
 	}
 	
 	@Override
-	public boolean saveLocation(LocationDto locationDto, UUID accountId) {
+	public List<VertexDto> saveLocation(LocationDto locationDto, UUID accountId) {
 		
+		List<VertexDto> vertexDtoList = new ArrayList<>();
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		Location location =Location.builder()
 					.timestamp(locationDto.getTtlDto().getTtl())
@@ -64,16 +63,21 @@ public class LocationService implements ILocationService{
 					.accountOption(accountOption)
 					.build();
 		
+		vertexDtoList.add(this.createVertexDto(locationDto.getVertexDto().getLatitude(),
+				locationDto.getVertexDto().getLongitude()));
+		
 		if(!this.checkLatestLocation(locationDto,accountId))
-			return false;
+			vertexDtoList.add(this.createVertexDto(0.0,0.0));
+		else
+			vertexDtoList.add(this.createVertexDto(1.0,0.0));
 		
 		locationRepository.save(location);
-		return true;
+		return vertexDtoList;
 	}
 	
 	@Override
-	public Map<String,Boolean> checkInAndOut(LocationDto locationDto, UUID accountId) {
-		Map<String,Boolean> map = new HashMap<>();
+	public List<VertexDto> checkInAndOut(LocationDto locationDto, UUID accountId) {
+		List<VertexDto> vertexDtoList = new ArrayList<>();
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
 		List<List<SafeZone>> totalSafeZoneList = new ArrayList<>();
@@ -81,19 +85,29 @@ public class LocationService implements ILocationService{
 		for(TTL ttl : ttlList) 
 			totalSafeZoneList.add(safeZoneService.findByTTLIdOrThrow(ttl.getId()));
 		
-		List<SafeZone> safeZoneList  =vertexUtil.checkInAndOutLocation(SafeZone.builder()
+		List<SafeZone> safeZoneList  =vertexCheckUtil.checkInAndOutLocation(SafeZone.builder()
 										.latitude(locationDto.getVertexDto().getLatitude())
 										.longitude(locationDto.getVertexDto().getLongitude()).build(), totalSafeZoneList, ttlList);
 		
 		double result = safeZoneList.remove(safeZoneList.size()-1).getLatitude();
 		System.out.println("result: "+result +": "+ safeZoneList.toString());
 		
+		vertexDtoList.add(this.createVertexDto(locationDto.getVertexDto().getLatitude(),
+				locationDto.getVertexDto().getLongitude()));
 		if(result==1.0)
-			map.put("inAndOut", true);
+			vertexDtoList.add(this.createVertexDto(1.0,0.0));
 		else
-			map.put("inAndOut", false);
+			vertexDtoList.add(this.createVertexDto(0.0,0.0));	
 		
-		return map;
+		return vertexDtoList;
+	}
+	
+	@Override
+	public VertexDto createVertexDto(double latitude, double longitude) {
+		return VertexDto.builder()
+		.latitude(latitude)
+		.longitude(longitude)
+		.build();
 	}
 	
 	@Override
