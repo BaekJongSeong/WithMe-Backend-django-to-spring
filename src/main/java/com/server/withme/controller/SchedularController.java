@@ -45,4 +45,13 @@ public class SchedularController {
 		List<Account> checkedAccountList = accountService.checkSevenDayOver(accountList);
 		safeZoneService.updateSafeZone(checkedAccountList);
 	}
+	
+	//여기 다시 보기
+		@GetMapping("/schedular/ttl")
+		@Scheduled(cron = "0 15 10 * * *")
+	    public void update() {
+			List<Account> accountList = accountService.findAllAccount();
+			List<Account> checkedAccountList = accountService.checkSevenDayOver(accountList);
+			safeZoneService.updateSafeZone(checkedAccountList);
+		}
 }

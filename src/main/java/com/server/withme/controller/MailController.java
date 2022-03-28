@@ -28,12 +28,14 @@ public class MailController {
 	private final IMailService mailService;
 	
 	@PostMapping("/mail")
-    public ResponseEntity<SafeZoneInfoDto> sendMail (
+    public ResponseEntity<SafeZoneInfoDto<String>> sendMail (
             @Validated @RequestBody SendMailDto sendMailDto
     ) {
 		mailService.sendMail(sendMailDto);
+		SafeZoneInfoDto<String> safeZoneInfoDto = new SafeZoneInfoDto<>();
 		
-		 return new ResponseEntity<>(SafeZoneInfoDto.builder()
-	        		.message("이메일 전송에 성공하였습니다.").build(),new HttpHeaders(),HttpStatus.OK);
+		safeZoneInfoDto.setMessage("이메일 전송에 성공하였습니다.");
+		
+		 return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
     }
 }
