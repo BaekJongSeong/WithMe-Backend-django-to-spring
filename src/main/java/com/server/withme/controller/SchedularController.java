@@ -37,5 +37,4 @@ public class SchedularController {
 		safeZoneService.updateSafeZone(checkedAccountList);
 	}
 
-		}
 }
