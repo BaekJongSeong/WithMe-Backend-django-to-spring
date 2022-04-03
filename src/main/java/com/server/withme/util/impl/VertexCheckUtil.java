@@ -30,6 +30,9 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 
 	private final ITTLService ttlService;	
 	
+	public String checkIfTrue(Map<String,Double> minMaxMap) {
+		return (minMaxMap.get("maxLongitude") - minMaxMap.get("minLongitude") > 0.0423) ? "true": "false";
+	}
 	//4.23KM 기준으로 움직임
 	@Override
 	public Map<String,String> checkSafeZoneMinSize(List<VertexDto> safeZoneList) {
@@ -40,12 +43,9 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 		result.put("minLongitude", String.valueOf(minMaxMap.get("minLongitude")));
 		result.put("mixLatitude", String.valueOf(minMaxMap.get("minLatitude")));
 		result.put("maxLongitude", String.valueOf(minMaxMap.get("maxLongitude")));
-		
-	    if (minMaxMap.get("maxLatitude") - minMaxMap.get("minLatitude") > 0.0423) {
-	        if (minMaxMap.get("maxLongitude") - minMaxMap.get("minLongitude") > 0.0423) result.put("result", "true");
-	        else result.put("result", "false");
-	    }
-	    else result.put("result", "false");
+	
+		String trueOrFalse = (minMaxMap.get("maxLatitude") - minMaxMap.get("minLatitude") > 0.0423) ? checkIfTrue(minMaxMap): "false";
+	    result.put("result", trueOrFalse);
 		return result;
 	}
 	
@@ -124,7 +124,7 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 			y+=perBoxSize;
 			col+=1;
 		}
-		return row*(int)((Double.valueOf(resultMap.get("longitude"))-Double.valueOf(resultMap.get("longitude"))) / perBoxSize)+col;
+		return row*(int)((Double.valueOf(resultMap.get("maxLongitude"))-Double.valueOf(resultMap.get("minLongitude"))) / perBoxSize)+col;
 	}
 	
 	@Override
@@ -132,8 +132,9 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 			List<VertexDto> vertexDtoList,List<VertexDto> totalList,Map<String,String> resultMap){
 		
 		List<List<VertexDto>> twoDimensionList = new ArrayList<>();
-		List<TTL> deleteTTLList = new ArrayList<>();
+		List<Integer> deleteTTLList = new ArrayList<>();
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
+		
 		for(int idx=0; idx<totalList.size();idx+=4)
 			twoDimensionList.add(totalList.subList(idx, idx+4));
 		int[] saveTTLList = new int[twoDimensionList.size()];
@@ -147,10 +148,10 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 		for(int idx=saveTTLList.length-1; idx>-1;idx--) {
 			if(saveTTLList[idx]==0) {
 				twoDimensionList.remove(idx);
-				deleteTTLList.add(ttlList.get(idx));
+				deleteTTLList.add(ttlList.get(idx).getId());
 			}
 		}	
-		ttlService.deleteAllTTL(deleteTTLList);
+		ttlService.deleteAllTTLById(deleteTTLList);
 		return twoDimensionList;
 	}
 	

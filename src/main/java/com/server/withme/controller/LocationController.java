@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
  *
  * @author Jongseong Baek
  */
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api")

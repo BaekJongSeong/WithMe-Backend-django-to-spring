@@ -66,8 +66,7 @@ public class TTLService implements ITTLService{
 	
 	@Override
 	public TTL ttlUpdate(TTL ttl, int index) {
-		TTL ttlOld = ttlRepository.findById(index).orElseThrow(() 
-        		-> new UsernameNotFoundException("not found ttl"));
+		TTL ttlOld = this.findByTTLIdOrThrow(index);
 		
 		Timestamp timestamp = this.calculateTimestamp(ttlOld.getTtl(), 1);
 		ttlOld.setTtl(timestamp);
@@ -92,9 +91,9 @@ public class TTLService implements ITTLService{
 	}
 	
 	@Override
-	public void deleteAllTTL(List<TTL> ttlList) {
-		for(TTL ttl : ttlList)
-			ttlRepository.delete(ttl);
+	public void deleteAllTTLById(List<Integer> ttlIdList){
+		for(Integer ttlId : ttlIdList)
+			ttlRepository.deleteById(ttlId);
 	}
 	
 	@Override
@@ -103,6 +102,12 @@ public class TTLService implements ITTLService{
 				.ttl(ttl.getTtl())
 				.build();
 	}
+	
+	@Override
+	public TTL findByTTLIdOrThrow(int index){
+		return ttlRepository.findById(index).orElseThrow(() 
+        		-> new UsernameNotFoundException("not found ttl"));
+	}	
 	
 	@Override
 	public List<TTL> findByAccountOptionIdOrThrow(Integer accountOptionId){

@@ -20,6 +20,7 @@ import com.server.withme.model.SafeZoneDto;
 import com.server.withme.model.SafeZoneInfoDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.serivce.ISafeZoneService;
+import com.server.withme.util.IVertexUtil;
 
 import lombok.RequiredArgsConstructor;
 
@@ -35,14 +36,16 @@ public class SafeZoneController {
 
 	private final ISafeZoneService safeZoneService;
 	
+	private final IVertexUtil vertexUtil;
+	
 	@PostMapping("/safe-zone/init/{accountId}")
     public ResponseEntity<SafeZoneInfoDto<VertexDto>> saveInitSafeZone (
             @PathVariable UUID accountId,
             @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
 		List<VertexDto> safeZoneList = safeZoneService.saveInitSafeZone(safeZoneDto, accountId);
-		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService
-				.craeteSafeZoneInfoDto(safeZoneList, safeZoneList.remove(safeZoneList.size()-1).getLatitude(),0);
+		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService.craeteSafeZoneInfoDto(
+					safeZoneList, safeZoneList.remove(safeZoneList.size()-1).getLatitude(),0);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
     }
 	
@@ -51,7 +54,7 @@ public class SafeZoneController {
             @PathVariable UUID accountId,
             @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
-		List<VertexDto> safeZoneList= safeZoneService.saveSafeZoneFirstTime(safeZoneDto,accountId);
+		List<VertexDto> safeZoneList= safeZoneService.saveSafeZoneFirstTime(vertexUtil.calculateVertex(safeZoneDto.getSafeZone()),accountId);
         return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(safeZoneList).build(),new HttpHeaders(),HttpStatus.OK);
     }

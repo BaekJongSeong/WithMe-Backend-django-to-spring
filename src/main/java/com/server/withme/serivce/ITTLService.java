@@ -23,9 +23,11 @@ public interface ITTLService {
 	
 	public Timestamp calculateTimestamp(Date timestamp, int index);
 	
-	public void deleteAllTTL(List<TTL> ttlList);
+	public void deleteAllTTLById(List<Integer> ttlIdList);
 	
 	public TTLDto createTTLDto(TTL ttl);
+	
+	public TTL findByTTLIdOrThrow(int index);
 	
 	public List<TTL> findByAccountOptionIdOrThrow(Integer accountOptionId);
 }

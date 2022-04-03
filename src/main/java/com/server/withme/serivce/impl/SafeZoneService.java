@@ -8,7 +8,6 @@ import java.util.UUID;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import com.server.withme.entity.Account;
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.InitSafeZone;
 import com.server.withme.entity.SafeZone;
@@ -23,7 +22,6 @@ import com.server.withme.repository.InitSafeZoneRepository;
 import com.server.withme.repository.SafeZoneRepository;
 import com.server.withme.repository.TTLRepository;
 import com.server.withme.serivce.IAccountOptionService;
-import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexCheckUtil;
@@ -51,9 +49,7 @@ public class SafeZoneService implements ISafeZoneService{
 	private final ISafeZoneService safeZoneService;
 	
 	private final IAccountOptionService accountOptionService;
-	
-	private final ILocationService locationService;
-	
+		
 	private final ITTLService ttlService;
 	
 	private final IVertexUtil vertexUtil;
@@ -83,13 +79,10 @@ public class SafeZoneService implements ISafeZoneService{
 	}
 	
 	@Override
-	public List<VertexDto> saveSafeZoneFirstTime(SafeZoneDto safeZoneDto, UUID accountId) {
+	public List<VertexDto> saveSafeZoneFirstTime(List<VertexDto> safeZone, UUID accountId) {
 		
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
-		List<VertexDto> initSafeZoneList = safeZoneDto.getSafeZone();
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
-
-		List<VertexDto> safeZoneList = vertexUtil.calculateVertex(initSafeZoneList);
 		
 		int count=0;
 		for(TTL ttl: ttlList) {
@@ -98,13 +91,13 @@ public class SafeZoneService implements ISafeZoneService{
 					break;
 				//spring batch bulk로 create하기
 				safeZoneRepository.save(SafeZone.builder()
-					.latitude(safeZoneList.get(count).getLatitude())
-					.longitude(safeZoneList.get(count).getLongitude())
+					.latitude(safeZone.get(count).getLatitude())
+					.longitude(safeZone.get(count).getLongitude())
 					.ttl(ttl).build());	
 				count++;
 			}
 		}
-		return safeZoneList;
+		return safeZone;
 	}
 	
 	@Override
@@ -119,12 +112,12 @@ public class SafeZoneService implements ISafeZoneService{
 		}
 		
 		List<SafeZone> deleteSafeZoneList = vertexUtil.calculateDeleteVertex(safeZoneList,accountOption);
-		ttlList.clear();
-		
+
+		List<Integer> ttlIndexList = new ArrayList<>();
 		for(int idx=0; idx<deleteSafeZoneList.size();idx+=4)
-			ttlList.add(deleteSafeZoneList.get(idx).getTtl());
+			ttlIndexList.add(deleteSafeZoneList.get(idx).getTtl().getId());
 		
-		ttlService.deleteAllTTL(ttlList);
+		ttlService.deleteAllTTLById(ttlIndexList);
 		
 		return vertexUtil.convertSafeZoneToVertexDto(deleteSafeZoneList);
 	}
@@ -145,43 +138,6 @@ public class SafeZoneService implements ISafeZoneService{
 	}
 	
 	@Override
-	public void updateSafeZone(List<Account> checkedAccountList) {
-		List<AccountOption> accountOptionList = accountOptionService.findAllFetchAccountOption(checkedAccountList);
-		
-		for(AccountOption accountOption: accountOptionList) {
-			List<VertexDto> locationList = vertexUtil.convertLocationToVertexDto(
-					locationService.findByAccountOptionIdOrThrow(accountOption.getId()));
-			
-			Map<String,String> resultMap = vertexCheckUtil.checkSafeZoneMinSize(locationList);
-			
-			if(resultMap.get("result").equals("true")) {
-				accountOption = accountOptionService.updateAccountOption(accountOption.getAccount().getAccountId(),
-						Double.valueOf(resultMap.get("latitude")),Double.valueOf(resultMap.get("longitude")));
-				
-				List<VertexDto> vertexDtoList= vertexUtil.calculateVertex(locationList);
-				ttlService.deleteAllTTL(ttlService.findByAccountOptionIdOrThrow(accountOption.getId()));	
-				ttlService.saveTTLFirstTime(vertexDtoList,accountOption);
-				
-				locationList = vertexCheckUtil.checkInAndOutForUpdate(accountOption,locationList, vertexDtoList, resultMap);
-			}
-		}
-	}
-	
-	@Override
-	public void saveSafeZoneAll(List<VertexDto> vertexDtoList, List<TTL> ttlList) {
-		int index=0;
-		for(int idx=0; idx<vertexDtoList.size();idx++) {
-			if(idx%4==0 &&idx!=0)
-				index++;
-				
-			safeZoneRepository.save(SafeZone.builder()
-					.latitude(vertexDtoList.get(idx).getLatitude())
-					.longitude(vertexDtoList.get(idx).getLongitude())
-					.ttl(ttlList.get(index)).build());
-		}
-	}
-	
-	@Override
 	public List<InitSafeZone> loadInitSafeZoneList(AccountIdDto accountIdDto){
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
 		return this.findByAccountOptionIdOrThrow(accountOption.getId());
@@ -190,18 +146,14 @@ public class SafeZoneService implements ISafeZoneService{
 	@Override
 	public <T> SafeZoneInfoDto<T> craeteSafeZoneInfoDto(List<T> list, double trueOrFalse, int flag){
 		SafeZoneInfoDto<T> safeZoneInfoDto = new SafeZoneInfoDto<>();
+		String message="";
 		
-		if(trueOrFalse> 0.0)
-			if(flag == 1)
-				safeZoneInfoDto.setMessage("location에 해당하는 safeZone의 TTL이 업데이트 되었습니다.");
-			else
-				safeZoneInfoDto.setMessage("등록이 완료되었습니다.");
-		else
-			if(flag == 1)
-				safeZoneInfoDto.setMessage("새로운 safeZone이 생성되었습니다.");
-			else
-			safeZoneInfoDto.setMessage("최소 size 또는 같은 위치 반복을 위반하여 등록되지 않았습니다.");
+		if(trueOrFalse> 0.0) 
+			message = (flag==1) ? "location에 해당하는 safeZone의 TTL이 업데이트 되었습니다." : "등록이 완료되었습니다.";
+		 else 
+			message = (flag==1) ? "새로운 safeZone이 생성되었습니다." : "최소 size 또는 같은 위치 반복을 위반하여 등록되지 않았습니다.";
 		
+		safeZoneInfoDto.setMessage(message);
 		safeZoneInfoDto.setData(list);
 		return safeZoneInfoDto;
 	}

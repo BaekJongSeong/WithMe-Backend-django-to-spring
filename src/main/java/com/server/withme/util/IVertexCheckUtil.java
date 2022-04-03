@@ -20,6 +20,8 @@ public interface IVertexCheckUtil {
 	
 	public int[] checkInAndOut(SafeZone target, List<SafeZone> totalSafeZoneList);
 	
+	public int findSafeZoneIndex(VertexDto vertexDto,Map<String,String> resultMap);
+	
 	public List<List<VertexDto>> checkInAndOutForUpdate(AccountOption accountOption,List<VertexDto> vertexDtoList,
 			List<VertexDto> totalList,Map<String,String> resultMap);
 	

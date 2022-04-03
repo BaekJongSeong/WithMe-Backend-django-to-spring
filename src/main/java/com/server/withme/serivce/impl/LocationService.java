@@ -66,11 +66,8 @@ public class LocationService implements ILocationService{
 		vertexDtoList.add(this.createVertexDto(locationDto.getVertexDto().getLatitude(),
 				locationDto.getVertexDto().getLongitude()));
 		
-		if(!this.checkLatestLocation(locationDto,accountId))
-			vertexDtoList.add(this.createVertexDto(0.0,0.0));
-		else
-			vertexDtoList.add(this.createVertexDto(1.0,0.0));
-		
+		VertexDto vertexDto = (!this.checkLatestLocation(locationDto,accountId)) ? this.createVertexDto(0.0,0.0): this.createVertexDto(1.0,0.0);
+		vertexDtoList.add(vertexDto);
 		locationRepository.save(location);
 		return vertexDtoList;
 	}
@@ -94,11 +91,9 @@ public class LocationService implements ILocationService{
 		
 		vertexDtoList.add(this.createVertexDto(locationDto.getVertexDto().getLatitude(),
 				locationDto.getVertexDto().getLongitude()));
-		if(result==1.0)
-			vertexDtoList.add(this.createVertexDto(1.0,0.0));
-		else
-			vertexDtoList.add(this.createVertexDto(0.0,0.0));	
 		
+		VertexDto vertexDto = (result==1.0) ? this.createVertexDto(1.0,0.0) : this.createVertexDto(0.0,0.0);
+		vertexDtoList.add(vertexDto);
 		return vertexDtoList;
 	}
 	
