@@ -17,29 +17,30 @@ import org.springframework.batch.item.database.JpaItemWriter;
 import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import com.server.withme.entity.Account;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Configuration
 @EnableBatchProcessing
+@RequiredArgsConstructor
 public class BatchConfig {
 
-    @Autowired public JobBuilderFactory jobBuilderFactory;
-    @Autowired public StepBuilderFactory stepBuilderFactory;
-    @Autowired public EntityManagerFactory entityManagerFactory;
+   	public final JobBuilderFactory jobBuilderFactory;
+    public final StepBuilderFactory stepBuilderFactory;
+    public final EntityManagerFactory entityManagerFactory;
 
     @Bean
-    public Job ExampleJob() throws Exception {
+    public Job exampleJob() throws Exception {
 
         Job exampleJob = jobBuilderFactory.get("exampleJob")
-                .start(Step())
+                .start(step())
                 .build();
 
         return exampleJob;
@@ -47,10 +48,10 @@ public class BatchConfig {
 
     @Bean
     @JobScope
-    public Step Step() throws Exception {
-        return stepBuilderFactory.get("Step")
+    public Step step() throws Exception {
+        return stepBuilderFactory.get("step")
                 .<Account,Account>chunk(10)
-                .reader(reader(null))
+                .reader(reader())
                 .processor(processor(null))
                 .writer(writer(null))
                 .build();
@@ -58,9 +59,7 @@ public class BatchConfig {
 
     @Bean
     @StepScope
-    public JpaPagingItemReader<Account> reader(@Value("#{jobParameters[date]}")  String date) throws Exception {
-
-        log.info("jobParameters value : " + date);
+    public JpaPagingItemReader<Account> reader() throws Exception {
 
         Map<String,Object> parameterValues = new HashMap<>();
         parameterValues.put("amount", 10000);
@@ -77,12 +76,10 @@ public class BatchConfig {
     @Bean
     @StepScope
     public ItemProcessor<Account, Account> processor(@Value("#{jobParameters[date]}")  String date){
-
+    	log.info("jobParameters value : " + date);
         return new ItemProcessor<Account, Account>() {
             @Override
             public Account process(Account member) throws Exception {
-
-                log.info("jobParameters value : " + date);
 
                 //1000원 추가 적립
                 member.setName(member.getName() + 1000);
@@ -96,10 +93,43 @@ public class BatchConfig {
     @StepScope
     public JpaItemWriter<Account> writer(@Value("#{jobParameters[date]}")  String date){
 
-        log.info("jobParameters value : " + date);
-
         return new JpaItemWriterBuilder<Account>()
                 .entityManagerFactory(entityManagerFactory)
+                .build();
+    }
+    
+    @Bean
+    public Job readJob(String sql) throws Exception {
+
+        Job exampleJob = jobBuilderFactory.get("readJob")
+                .start(stepforRead(sql))
+                .build();
+
+        return exampleJob;
+    }
+    
+    @Bean
+    @JobScope
+    public Step stepforRead(String sql) throws Exception {
+        return stepBuilderFactory.get("Step")
+                .<Account,Account>chunk(20)
+                .reader(reader(sql))
+                .build();
+    }
+    
+    @Bean
+    @StepScope
+    public JpaPagingItemReader<Account> reader(@Value("#{jobParameters[sql]}")  String sql) throws Exception {
+
+        Map<String,Object> parameterValues = new HashMap<>();
+        parameterValues.put("amount", 10000);
+
+        return new JpaPagingItemReaderBuilder<Account>()
+                .pageSize(20)
+                .parameterValues(parameterValues)
+                .queryString(sql)
+                .entityManagerFactory(entityManagerFactory)
+                .name("JpaPagingItemReader")
                 .build();
     }
 }
