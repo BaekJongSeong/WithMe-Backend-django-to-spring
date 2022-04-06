@@ -12,6 +12,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.server.withme.entity.Account;
+import com.server.withme.enumclass.DayCalculator;
 import com.server.withme.model.AccountDto;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LoginDto;
@@ -85,7 +86,8 @@ public class AccountService implements IAccountService {
 		Account account = this.findByUsernameOrThrow(loginDto.getUsername());
 		
 		return AccountIdDto.builder()
-				.accountId(account.getAccountId()).build();
+				.accountId(account.getAccountId())
+				.build();
 	}
 	
 	@Override
@@ -96,14 +98,10 @@ public class AccountService implements IAccountService {
 	@Override
     public List<Account> checkSevenDayOver(List<Account> accountList){
 		List<Account> checkedAccountList = new ArrayList<>();
-		Calendar cal = Calendar.getInstance();
-		Calendar calStandard = Calendar.getInstance();
-		calStandard.setTime(new Timestamp(System.currentTimeMillis()));
+		Calendar calStandard = DayCalculator.ZERO.calculateDay(new Timestamp(System.currentTimeMillis()));
 		
-		for(Account account : accountList) {
-			cal.setTime(account.getTimestamp());
-			cal.add(Calendar.DATE, 7);
-			
+		for(Account account : accountList) { 
+			Calendar cal = DayCalculator.SEVEN.calculateDay(account.getTimestamp());
 			if(cal.getTime().getTime() < calStandard.getTime().getTime())
 				checkedAccountList.add(account);
 		}

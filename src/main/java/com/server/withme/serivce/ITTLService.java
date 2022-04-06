@@ -1,7 +1,4 @@
 package com.server.withme.serivce;
-
-import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 import com.server.withme.entity.AccountOption;
@@ -20,9 +17,7 @@ public interface ITTLService {
 	public TTL saveTTL(AccountOption accountOption);
 	
 	public TTL ttlUpdate(TTL ttl, int index);
-	
-	public Timestamp calculateTimestamp(Date timestamp, int index);
-	
+		
 	public void deleteAllTTLById(List<Integer> ttlIdList);
 	
 	public TTLDto createTTLDto(TTL ttl);

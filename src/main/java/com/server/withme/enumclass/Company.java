@@ -1,7 +1,6 @@
 package com.server.withme.enumclass;
 
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 
 /*
  * 상수와 특정값을 연결시켜놓은건데 특정값을 연결시키려면 해당 값들을 리턴할 수 있는 함수가 선언되어있어야한다.

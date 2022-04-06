@@ -5,18 +5,28 @@ import java.util.function.Function;
 //아래는 람다버전, 위는 추상 메소드 버전, enum 필드에 추상 메소드 설정하고 각 enum요소들에서 구현....크
 
 public enum CalculatorType {
-	CALC_A{
+	CALC_A("오"){
 		long calculate(long value) {return value;}
 	},
-	CALC_B{
+	CALC_B("우"){
 		long calculate(long value){return value * 10;}
 	},
-	CALC_C{
+	CALC_C("진짜"){
 		long calculate(long value){return value * 3;}
 	},
-	CALC_ETC{
+	CALC_ETC("개멋있네"){
 		long calculate(long value){return 0L;}
 	};
+	
+	private final String val;
+	
+	CalculatorType(String val){
+		this.val=val;
+	}
+	
+	public String getVal() {
+		return val;
+	}
 	
 	abstract long calculate(long value);
 

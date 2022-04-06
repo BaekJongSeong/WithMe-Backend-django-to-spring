@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
  *
  * @author Jongseong Baek
  */
-
+/*
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/best-visit-place")
@@ -80,3 +80,4 @@ public class MostVisitPlaceController {
 		return true;
 	}
 }
+*/
