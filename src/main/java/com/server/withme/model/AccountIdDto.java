@@ -3,7 +3,6 @@ package com.server.withme.model;
 import com.sun.istack.NotNull;
 import lombok.*;
 
-import java.util.Date;
 import java.util.UUID;
 
 /**

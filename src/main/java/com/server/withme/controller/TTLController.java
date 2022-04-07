@@ -48,7 +48,7 @@ public class TTLController {
     ) {
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
 		
-		List<VertexDto> vertexDtoList = vertexUtil.convertInitSafeZoneToVertexDto(
+		List<VertexDto> vertexDtoList = vertexUtil.convertToVertexDto(
 				safeZoneService.loadInitSafeZoneList(accountIdDto));
 		
 		ttlService.saveTTLFirstTime(vertexDtoList,accountOption);

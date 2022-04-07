@@ -1,7 +1,6 @@
 package com.server.withme.model;
 
 import java.util.Date;
-import java.util.List;
 
 import com.sun.istack.NotNull;
 

@@ -41,7 +41,7 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 	public List<VertexDto> checkSafeZoneMinSize(List<VertexDto> safeZoneList) {
 		
 		List<VertexDto> vertexDtoList = this.findMinMaxVertex(safeZoneList);
-		boolean TF = (vertexDtoList.get(0).getLatitude() - vertexDtoList.get(1).getLatitude() > 0.0423) ? checkIfTrue(vertexDtoList): false;
+		boolean TF = (vertexDtoList.get(0).getLatitude() - vertexDtoList.get(1).getLatitude() > 0.0423) ? this.checkIfTrue(vertexDtoList): false;
 		vertexDtoList.get(0).setTF(TF);
 		vertexDtoList.get(1).setTF(TF);
 	
@@ -52,12 +52,12 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 	public List<VertexDto> findMinMaxVertex(List<VertexDto> safeZoneList){
 			
 		safeZoneList.sort(Comparator.comparing(VertexDto::getLatitude).reversed());
-		VertexDto vertex1 = locationService.createVertexDto(safeZoneList.get(0).getLatitude(), 
-				safeZoneList.get(safeZoneList.size()-1).getLatitude(), true);
+		double maxX = safeZoneList.get(0).getLatitude(); double minX = safeZoneList.get(safeZoneList.size()-1).getLatitude();
 		safeZoneList.sort(Comparator.comparing(VertexDto::getLongitude).reversed());
-		VertexDto vertex2 =locationService.createVertexDto(safeZoneList.get(0).getLatitude(), 
-				safeZoneList.get(safeZoneList.size()-1).getLatitude(), true);
+		double maxY = safeZoneList.get(0).getLongitude(); double minY = safeZoneList.get(safeZoneList.size()-1).getLongitude();
 		
+		VertexDto vertex1 = locationService.createVertexDto(maxX,minY, true);
+		VertexDto vertex2 =locationService.createVertexDto(minX,maxY,true); 		
 		return new ArrayList<VertexDto>(Arrays.asList(vertex1,vertex2));
 	}
 	

@@ -84,6 +84,7 @@ public class LocationService implements ILocationService{
 				locationDto.getVertexDto().getLongitude(), TF);
 	}
 	
+	
 	public VertexDto createVertexDto(double latitude, double longitude) {
 		return VertexDto.builder()
 		.latitude(latitude)

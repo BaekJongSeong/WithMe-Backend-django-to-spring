@@ -9,6 +9,8 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
+import com.server.withme.enumclass.IVertexDto;
+
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -32,7 +34,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "InitSafeZone entity: creating safe_zone, just one box(whole safe zone here)")
-public class InitSafeZone implements Serializable {
+public class InitSafeZone implements Serializable,IVertexDto {
 	private static final long serialVersionUID = 1L;
 
 	 @Id
@@ -42,6 +44,15 @@ public class InitSafeZone implements Serializable {
 	 private Double latitude;
 	 
 	 private Double longitude;
+	 
+	 @Override
+	 public double getLatitude() {
+		 return latitude;
+	 }
+	 @Override	
+	 public double getLongitude() {
+		 return longitude;
+	 }
 	 
 	 @ManyToOne
 	 private AccountOption accountOption;

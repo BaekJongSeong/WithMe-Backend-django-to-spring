@@ -15,6 +15,7 @@ import javax.persistence.TemporalType;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.server.withme.enumclass.IVertexDto;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -38,7 +39,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "Lcoation entity: point for latitude and longitude, insert per 5 second, major thing for processing safe zone (extend and resizing)")
-public class Location implements Serializable {
+public class Location implements Serializable, IVertexDto{
 	private static final long serialVersionUID = 1L;
 
 	 @Id
@@ -54,6 +55,15 @@ public class Location implements Serializable {
     private Double latitude;
     
     private Double longitude;
+    
+	 @Override
+	 public double getLatitude() {
+		 return latitude;
+	 }
+	 @Override	
+	 public double getLongitude() {
+		 return longitude;
+	 }
     
     @ManyToOne
     private AccountOption accountOption;

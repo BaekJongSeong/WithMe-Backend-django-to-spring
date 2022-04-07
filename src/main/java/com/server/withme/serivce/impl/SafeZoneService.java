@@ -105,20 +105,17 @@ public class SafeZoneService implements ISafeZoneService{
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
 		
 		List<SafeZone> safeZoneList = new ArrayList<>();
-		for(TTL ttl: ttlList) {
-			List<SafeZone> tempSafeZoneList = safeZoneService.findByTTLIdOrThrow(ttl.getId());
-			safeZoneList.addAll(tempSafeZoneList);
-		}
+		for(TTL ttl: ttlList) 
+			safeZoneList.addAll(safeZoneService.findByTTLIdOrThrow(ttl.getId()));
 		
 		List<SafeZone> deleteSafeZoneList = vertexUtil.calculateDeleteVertex(safeZoneList,accountOption);
-
 		List<Integer> ttlIndexList = new ArrayList<>();
 		for(int idx=0; idx<deleteSafeZoneList.size();idx+=4)
 			ttlIndexList.add(deleteSafeZoneList.get(idx).getTtl().getId());
 		
 		ttlService.deleteAllTTLById(ttlIndexList);
 		
-		return vertexUtil.convertSafeZoneToVertexDto(deleteSafeZoneList);
+		return vertexUtil.convertToVertexDto(deleteSafeZoneList);
 	}
 	
 	@Override

@@ -4,20 +4,16 @@ import java.util.List;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.InitSafeZone;
-import com.server.withme.entity.Location;
 import com.server.withme.entity.SafeZone;
+import com.server.withme.enumclass.IVertexDto;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
 
 public interface IVertexUtil {
 	
-	public List<VertexDto> convertLocationToVertexDto(List<Location> locationList);
-	
-	public List<VertexDto> convertInitSafeZoneToVertexDto(List<InitSafeZone> initSafeZoneList);
+	public <T extends IVertexDto> List<VertexDto> convertToVertexDto(List<T> list);
 	
 	public List<SafeZone> convertInitSafeZoneToSafeZone(List<InitSafeZone> initSafeZoneList);
-	
-	public List<VertexDto> convertSafeZoneToVertexDto(List<SafeZone> initSafeZoneList);
 	
 	public List<VertexDto> createNewSafeZone(List<VertexDto> safeZoneList, double x, double y, double perBoxSize);
 	

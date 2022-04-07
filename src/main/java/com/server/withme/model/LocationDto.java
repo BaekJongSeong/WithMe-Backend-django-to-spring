@@ -1,5 +1,6 @@
 package com.server.withme.model;
 
+import com.server.withme.enumclass.IVertexDto;
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;

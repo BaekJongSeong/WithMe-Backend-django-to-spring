@@ -7,8 +7,8 @@ import org.springframework.stereotype.Component;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.InitSafeZone;
-import com.server.withme.entity.Location;
 import com.server.withme.entity.SafeZone;
+import com.server.withme.enumclass.IVertexDto;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.serivce.ILocationService;
@@ -32,28 +32,12 @@ public class VertexUtil implements IVertexUtil{
 		
 	private final IVertexCheckUtil vertexCheckUtil;
 	
-	@Override 
-	public List<VertexDto> convertLocationToVertexDto(List<Location> locationList){
-		List<VertexDto> locationListChanged = new ArrayList<>();
-		
-		for(Location location : locationList) {		
-			VertexDto vertexDto = locationService.createVertexDto(location.getLatitude(),location.getLongitude(),true);
-			locationListChanged.add(vertexDto);
-		}
-		
-		return locationListChanged;
-	}
-	
 	@Override
-	public List<VertexDto> convertInitSafeZoneToVertexDto(List<InitSafeZone> initSafeZoneList){
-		List<VertexDto> initSafeZoneListChanged = new ArrayList<>();
-		
-		for(InitSafeZone initSafeZone : initSafeZoneList) {		
-			VertexDto vertexDto = locationService.createVertexDto(initSafeZone.getLatitude(),initSafeZone.getLongitude(),true);
-			initSafeZoneListChanged.add(vertexDto);
-		}
-		
-		return initSafeZoneListChanged;
+	public <T extends IVertexDto> List<VertexDto> convertToVertexDto(List<T> list){
+		List<VertexDto> vertexDtoList = new ArrayList<>();
+		for(T item : list)
+			vertexDtoList.add(locationService.createVertexDto(item.getLatitude(),item.getLongitude(),true));
+		return vertexDtoList;
 	}
 	
 	@Override
@@ -67,19 +51,6 @@ public class VertexUtil implements IVertexUtil{
 		
 			safeZoneListChanged.add(vertexDto);
 		}
-		return safeZoneListChanged;
-	}
-	
-	@Override
-	public List<VertexDto> convertSafeZoneToVertexDto(List<SafeZone> safeZoneList){
-		
-		List<VertexDto> safeZoneListChanged = new ArrayList<>();
-		
-		for(SafeZone initSafeZone : safeZoneList) {
-			VertexDto vertexDto = locationService.createVertexDto(initSafeZone.getLatitude(),initSafeZone.getLongitude(),true);
-			safeZoneListChanged.add(vertexDto);
-		}
-		
 		return safeZoneListChanged;
 	}
 

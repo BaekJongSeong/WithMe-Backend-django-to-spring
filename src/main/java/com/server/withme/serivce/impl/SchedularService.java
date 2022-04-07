@@ -2,7 +2,6 @@ package com.server.withme.serivce.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Service;
 
@@ -48,7 +47,7 @@ public class SchedularService implements ISchedularService{
 		List<AccountOption> accountOptionList = accountOptionService.findAllFetchAccountOption(checkedAccountList);
 		
 		for(AccountOption accountOption: accountOptionList) {
-			List<VertexDto> locationList = vertexUtil.convertLocationToVertexDto(
+			List<VertexDto> locationList = vertexUtil.convertToVertexDto(
 					locationService.findByAccountOptionIdOrThrow(accountOption.getId()));
 			
 			List<VertexDto> vertexDto = vertexCheckUtil.checkSafeZoneMinSize(locationList);
