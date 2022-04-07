@@ -52,9 +52,8 @@ public class LocationService implements ILocationService{
 	}
 	
 	@Override
-	public List<VertexDto> saveLocation(LocationDto locationDto, UUID accountId) {
+	public VertexDto saveLocation(LocationDto locationDto, UUID accountId) {
 		
-		List<VertexDto> vertexDtoList = new ArrayList<>();
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		Location location =Location.builder()
 					.timestamp(locationDto.getTtlDto().getTtl())
@@ -62,19 +61,14 @@ public class LocationService implements ILocationService{
 					.longitude(locationDto.getVertexDto().getLongitude())
 					.accountOption(accountOption)
 					.build();
-		
-		vertexDtoList.add(this.createVertexDto(locationDto.getVertexDto().getLatitude(),
-				locationDto.getVertexDto().getLongitude()));
-		
-		VertexDto vertexDto = (!this.checkLatestLocation(locationDto,accountId)) ? this.createVertexDto(0.0,0.0): this.createVertexDto(1.0,0.0);
-		vertexDtoList.add(vertexDto);
+	
 		locationRepository.save(location);
-		return vertexDtoList;
+		return this.createVertexDto(locationDto.getVertexDto().getLatitude(),
+				locationDto.getVertexDto().getLongitude(),this.checkLatestLocation(locationDto,accountId));
 	}
 	
 	@Override
-	public List<VertexDto> checkInAndOut(LocationDto locationDto, UUID accountId) {
-		List<VertexDto> vertexDtoList = new ArrayList<>();
+	public VertexDto checkInAndOut(LocationDto locationDto, UUID accountId) {
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
 		List<List<SafeZone>> totalSafeZoneList = new ArrayList<>();
@@ -82,26 +76,26 @@ public class LocationService implements ILocationService{
 		for(TTL ttl : ttlList) 
 			totalSafeZoneList.add(safeZoneService.findByTTLIdOrThrow(ttl.getId()));
 		
-		List<SafeZone> safeZoneList  =vertexCheckUtil.checkInAndOutLocation(SafeZone.builder()
-										.latitude(locationDto.getVertexDto().getLatitude())
-										.longitude(locationDto.getVertexDto().getLongitude()).build(), totalSafeZoneList, ttlList);
-		
-		double result = safeZoneList.remove(safeZoneList.size()-1).getLatitude();
-		System.out.println("result: "+result +": "+ safeZoneList.toString());
-		
-		vertexDtoList.add(this.createVertexDto(locationDto.getVertexDto().getLatitude(),
-				locationDto.getVertexDto().getLongitude()));
-		
-		VertexDto vertexDto = (result==1.0) ? this.createVertexDto(1.0,0.0) : this.createVertexDto(0.0,0.0);
-		vertexDtoList.add(vertexDto);
-		return vertexDtoList;
+		Boolean TF  =vertexCheckUtil.checkInAndOutLocation(SafeZone.builder()
+				.latitude(locationDto.getVertexDto().getLatitude())
+				.longitude(locationDto.getVertexDto().getLongitude()).build(), totalSafeZoneList, ttlList);
+
+		return this.createVertexDto(locationDto.getVertexDto().getLatitude(),
+				locationDto.getVertexDto().getLongitude(), TF);
 	}
 	
-	@Override
 	public VertexDto createVertexDto(double latitude, double longitude) {
 		return VertexDto.builder()
 		.latitude(latitude)
 		.longitude(longitude)
+		.build();
+	}
+	
+	@Override
+	public VertexDto createVertexDto(double latitude, double longitude, boolean TF) {
+		return VertexDto.builder()
+		.latitude(latitude)
+		.longitude(longitude).TF(TF)
 		.build();
 	}
 	

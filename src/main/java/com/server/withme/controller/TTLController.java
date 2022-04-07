@@ -1,5 +1,6 @@
 package com.server.withme.controller;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.http.HttpHeaders;
@@ -12,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.withme.entity.AccountOption;
-import com.server.withme.entity.TTL;
+import com.server.withme.enumclass.DayCalculator;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.TTLDto;
 import com.server.withme.model.VertexDto;
@@ -50,8 +51,8 @@ public class TTLController {
 		List<VertexDto> vertexDtoList = vertexUtil.convertInitSafeZoneToVertexDto(
 				safeZoneService.loadInitSafeZoneList(accountIdDto));
 		
-		TTL ttl = ttlService.saveTTLFirstTime(vertexDtoList,accountOption);
-		TTLDto ttlDto = ttlService.createTTLDto(ttl);
+		ttlService.saveTTLFirstTime(vertexDtoList,accountOption);
+		TTLDto ttlDto = ttlService.createTTLDto(DayCalculator.ZERO.calculateDay(new Timestamp(System.currentTimeMillis())).getTime());
         return new ResponseEntity<>(ttlDto,new HttpHeaders(),HttpStatus.OK);
     }
 	

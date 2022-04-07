@@ -51,11 +51,11 @@ public class SchedularService implements ISchedularService{
 			List<VertexDto> locationList = vertexUtil.convertLocationToVertexDto(
 					locationService.findByAccountOptionIdOrThrow(accountOption.getId()));
 			
-			Map<String,String> resultMap = vertexCheckUtil.checkSafeZoneMinSize(locationList);
+			List<VertexDto> vertexDto = vertexCheckUtil.checkSafeZoneMinSize(locationList);
 			
-			if(resultMap.get("result").equals("true")) {
+			if(vertexDto.get(0).getTF()) {
 				accountOption = accountOptionService.updateAccountOption(accountOption.getAccount().getAccountId(),
-						Double.valueOf(resultMap.get("maxLatitude")),Double.valueOf(resultMap.get("minLongitude")));
+						vertexDto.get(0).getLatitude(),vertexDto.get(0).getLongitude());
 				
 				List<VertexDto> vertexDtoList= vertexUtil.calculateVertex(locationList);
 				List<TTL> ttlList = ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
@@ -68,7 +68,7 @@ public class SchedularService implements ISchedularService{
 				ttlService.saveTTLFirstTime(vertexDtoList,accountOption);
 				safeZoneService.saveSafeZoneFirstTime(vertexDtoList, accountOption.getAccount().getAccountId());
 				List<List<VertexDto>> finalSafeZoneList = vertexCheckUtil.
-						checkInAndOutForUpdate(accountOption,locationList, vertexDtoList, resultMap);
+						checkInAndOutForUpdate(accountOption,locationList, vertexDtoList, vertexDto);
 				
 				System.out.println("this is now updated safeZone\n"+finalSafeZoneList.toString());
 			}

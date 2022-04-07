@@ -1,10 +1,9 @@
 package com.server.withme.util.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -14,6 +13,7 @@ import com.server.withme.entity.SafeZone;
 import com.server.withme.entity.TTL;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
+import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexCheckUtil;
 
@@ -28,56 +28,53 @@ import lombok.RequiredArgsConstructor;
 @Component
 public class VertexCheckUtil implements IVertexCheckUtil{
 
-	private final ITTLService ttlService;	
+	private final ITTLService ttlService;
 	
-	public String checkIfTrue(Map<String,Double> minMaxMap) {
-		return (minMaxMap.get("maxLongitude") - minMaxMap.get("minLongitude") > 0.0423) ? "true": "false";
+	private final ILocationService locationService;
+	
+	public boolean checkIfTrue(List<VertexDto> vertexDtoList) {
+		return (vertexDtoList.get(1).getLongitude() - vertexDtoList.get(0).getLongitude() > 0.0423) ? true: false;
 	}
+	
 	//4.23KM 기준으로 움직임
 	@Override
-	public Map<String,String> checkSafeZoneMinSize(List<VertexDto> safeZoneList) {
+	public List<VertexDto> checkSafeZoneMinSize(List<VertexDto> safeZoneList) {
 		
-		Map<String,String> result = new HashMap<>();
-		Map<String,Double> minMaxMap = this.findMinMaxVertex(safeZoneList);
-		result.put("maxLatitude", String.valueOf(minMaxMap.get("maxLatitude")));
-		result.put("minLongitude", String.valueOf(minMaxMap.get("minLongitude")));
-		result.put("mixLatitude", String.valueOf(minMaxMap.get("minLatitude")));
-		result.put("maxLongitude", String.valueOf(minMaxMap.get("maxLongitude")));
+		List<VertexDto> vertexDtoList = this.findMinMaxVertex(safeZoneList);
+		boolean TF = (vertexDtoList.get(0).getLatitude() - vertexDtoList.get(1).getLatitude() > 0.0423) ? checkIfTrue(vertexDtoList): false;
+		vertexDtoList.get(0).setTF(TF);
+		vertexDtoList.get(1).setTF(TF);
 	
-		String trueOrFalse = (minMaxMap.get("maxLatitude") - minMaxMap.get("minLatitude") > 0.0423) ? checkIfTrue(minMaxMap): "false";
-	    result.put("result", trueOrFalse);
-		return result;
+		return vertexDtoList;
 	}
 	
 	@Override
-	public Map<String,Double> findMinMaxVertex(List<VertexDto> safeZoneList){
-		
-		Map<String,Double> minMaxMap = new HashMap<>();
-		
+	public List<VertexDto> findMinMaxVertex(List<VertexDto> safeZoneList){
+			
 		safeZoneList.sort(Comparator.comparing(VertexDto::getLatitude).reversed());
-		minMaxMap.put("maxLatitude",safeZoneList.get(0).getLatitude());
-		minMaxMap.put("minLatitude",safeZoneList.get(safeZoneList.size()-1).getLatitude());
-		
+		VertexDto vertex1 = locationService.createVertexDto(safeZoneList.get(0).getLatitude(), 
+				safeZoneList.get(safeZoneList.size()-1).getLatitude(), true);
 		safeZoneList.sort(Comparator.comparing(VertexDto::getLongitude).reversed());
-		minMaxMap.put("maxLongitude",safeZoneList.get(0).getLongitude());
-		minMaxMap.put("minLongitude",safeZoneList.get(safeZoneList.size()-1).getLongitude());
-		return minMaxMap;
+		VertexDto vertex2 =locationService.createVertexDto(safeZoneList.get(0).getLatitude(), 
+				safeZoneList.get(safeZoneList.size()-1).getLatitude(), true);
+		
+		return new ArrayList<VertexDto>(Arrays.asList(vertex1,vertex2));
 	}
 	
 	@Override
 	public Integer countSafeZone(List<VertexDto> initSafeZoneListChanged) {
 				
-		Map<String,Double> minMaxMap = this.findMinMaxVertex(initSafeZoneListChanged);
+		List<VertexDto> vertexDtoList = this.findMinMaxVertex(initSafeZoneListChanged);
 		
-		double x= minMaxMap.get("maxLatitude");
+		double x= vertexDtoList.get(0).getLatitude();
 		Double perBoxSize = (double) (100/100000);
 		Integer row=0,col=0;
 		
-		while(x > minMaxMap.get("minLatitude")) {
+		while(x > vertexDtoList.get(1).getLatitude()) {
 			
-			double y=minMaxMap.get("minLongitude");
+			double y=vertexDtoList.get(0).getLongitude();
 			
-			while(y < minMaxMap.get("maxLongitude")) {
+			while(y < vertexDtoList.get(1).getLongitude()) {
 				y += perBoxSize;
 				col++;
 			}
@@ -111,10 +108,10 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 	}
 	
 	@Override
-	public int findSafeZoneIndex(VertexDto vertexDto,Map<String,String> resultMap) {
+	public int findSafeZoneIndex(VertexDto vertexDto,List<VertexDto> vertexDtoList) {
 		Double perBoxSize = (double) (100/100000);
-		double x = Double.valueOf(resultMap.get("maxLatitude"));
-		double y = Double.valueOf(resultMap.get("minLongitude"));
+		double x = Double.valueOf(vertexDtoList.get(0).getLatitude());
+		double y = Double.valueOf(vertexDtoList.get(0).getLongitude());
 		int row=0,col=0;
 		while(row > vertexDto.getLatitude()) {
 			x-=perBoxSize;
@@ -124,12 +121,12 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 			y+=perBoxSize;
 			col+=1;
 		}
-		return row*(int)((Double.valueOf(resultMap.get("maxLongitude"))-Double.valueOf(resultMap.get("minLongitude"))) / perBoxSize)+col;
+		return row*(int)((vertexDtoList.get(1).getLongitude()-vertexDtoList.get(0).getLongitude()) / perBoxSize)+col;
 	}
 	
 	@Override
 	public List<List<VertexDto>> checkInAndOutForUpdate(AccountOption accountOption,
-			List<VertexDto> vertexDtoList,List<VertexDto> totalList,Map<String,String> resultMap){
+			List<VertexDto> vertexDtoList,List<VertexDto> totalList,List<VertexDto> vertexDto){
 		
 		List<List<VertexDto>> twoDimensionList = new ArrayList<>();
 		List<Integer> deleteTTLList = new ArrayList<>();
@@ -141,7 +138,7 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 				
 		int index=0;
 		for(int idx=0; idx<vertexDtoList.size();idx++) {
-			index = this.findSafeZoneIndex(vertexDtoList.get(idx),resultMap);
+			index = this.findSafeZoneIndex(vertexDtoList.get(idx),vertexDto);
 			saveTTLList[index]=1;
 		}
 		
@@ -180,10 +177,8 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 	}
 
 	@Override
-	public List<SafeZone> checkInAndOutLocation(SafeZone target, List<List<SafeZone>> totalSafeZoneList,List<TTL> ttlList){
-		List<SafeZone> safeZoneList = new ArrayList<>();
-		int status = 0;
-		int countVertex=0;
+	public Boolean checkInAndOutLocation(SafeZone target, List<List<SafeZone>> totalSafeZoneList,List<TTL> ttlList){
+		int status = 0, countVertex=0;
 		for(List<SafeZone> totalSafeZone: totalSafeZoneList) {
 
 			int[] result = checkInAndOut(target, totalSafeZone);
@@ -197,9 +192,7 @@ public class VertexCheckUtil implements IVertexCheckUtil{
             	break;
 			}
 		}
-		//signing
-		safeZoneList.add(SafeZone.builder().latitude((double) status).build());
-		return safeZoneList;
+		return status==1 ? true : false;
 	}
 	
 	@Override

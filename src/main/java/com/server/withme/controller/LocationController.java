@@ -1,6 +1,7 @@
 package com.server.withme.controller;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.UUID;
 
 import org.springframework.http.HttpHeaders;
@@ -41,9 +42,9 @@ public class LocationController {
     		@PathVariable UUID accountId,
             @Validated @RequestBody LocationDto locationDto
     ) {
-		List<VertexDto> location = locationService.saveLocation(locationDto,accountId);
+		VertexDto location = locationService.saveLocation(locationDto,accountId);
 		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService
-				.craeteSafeZoneInfoDto(location,location.remove(location.size()-1).getLatitude(),0);
+				.craeteSafeZoneInfoDto(new ArrayList<VertexDto>(Arrays.asList(location)),location.getTF(),0);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
 	}
 	
@@ -52,9 +53,9 @@ public class LocationController {
     		@PathVariable UUID accountId,
             @Validated @RequestBody LocationDto locationDto
     ) {
-		List<VertexDto> location = locationService.checkInAndOut(locationDto,accountId);
+		VertexDto location = locationService.checkInAndOut(locationDto,accountId);
 		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService
-				.craeteSafeZoneInfoDto(location,location.remove(location.size()-1).getLatitude(),1);
+				.craeteSafeZoneInfoDto(new ArrayList<VertexDto>(Arrays.asList(location)),location.getTF(),1);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
 	}
 }

@@ -1,5 +1,7 @@
 package com.server.withme.controller;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,9 +45,9 @@ public class SafeZoneController {
             @PathVariable UUID accountId,
             @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
-		List<VertexDto> safeZoneList = safeZoneService.saveInitSafeZone(safeZoneDto, accountId);
+		VertexDto vertexDto = safeZoneService.saveInitSafeZone(safeZoneDto, accountId);
 		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService.craeteSafeZoneInfoDto(
-					safeZoneList, safeZoneList.remove(safeZoneList.size()-1).getLatitude(),0);
+					new ArrayList<VertexDto>(Arrays.asList(vertexDto)), vertexDto.getTF(),0);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
     }
 	

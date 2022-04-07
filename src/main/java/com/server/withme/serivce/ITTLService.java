@@ -1,4 +1,5 @@
 package com.server.withme.serivce;
+import java.util.Date;
 import java.util.List;
 
 import com.server.withme.entity.AccountOption;
@@ -12,7 +13,7 @@ import com.server.withme.model.VertexDto;
  */
 public interface ITTLService {
 	
-	public TTL saveTTLFirstTime(List<VertexDto> initSafeZoneList, AccountOption accountOption);
+	public void saveTTLFirstTime(List<VertexDto> initSafeZoneList, AccountOption accountOption);
 	
 	public TTL saveTTL(AccountOption accountOption);
 	
@@ -20,7 +21,9 @@ public interface ITTLService {
 		
 	public void deleteAllTTLById(List<Integer> ttlIdList);
 	
-	public TTLDto createTTLDto(TTL ttl);
+	public TTLDto createTTLDto(Date date);
+	
+	public TTL createTTLEntity(Date date, AccountOption accountOption);
 	
 	public TTL findByTTLIdOrThrow(int index);
 	

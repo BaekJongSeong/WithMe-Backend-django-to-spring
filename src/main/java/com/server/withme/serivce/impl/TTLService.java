@@ -1,6 +1,7 @@
 package com.server.withme.serivce.impl;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,27 +35,19 @@ public class TTLService implements ITTLService{
 	
 	
 	@Override
-	public TTL saveTTLFirstTime(List<VertexDto> initSafeZoneList, AccountOption accountOption) {
+	public void saveTTLFirstTime(List<VertexDto> initSafeZoneList, AccountOption accountOption) {
 			Integer count = vertexCheckUtil.countSafeZone(initSafeZoneList);
-			
-			TTL ttl = TTL.builder()
-					.ttl(DayCalculator.SEVEN.calculateDay(new Timestamp(System.currentTimeMillis())).getTime())
-					.accountOption(accountOption).build();
-			
 			for(int idx=0; idx< count; idx++)
-				ttlRepository.save(ttl);
-			
-			return ttl;
+				ttlRepository.save(createTTLEntity(
+						DayCalculator.SEVEN.calculateDay(new Timestamp(System.currentTimeMillis())).getTime(),
+						accountOption));
 	}
 	
 	@Override 
 	public TTL saveTTL(AccountOption accountOption) {
-
-		TTL ttl = TTL.builder()
-				.ttl(DayCalculator.ONE.calculateDay(new Timestamp(System.currentTimeMillis())).getTime())
-				.accountOption(accountOption).build();
-		
-		return ttlRepository.save(ttl);
+		return ttlRepository.save(createTTLEntity(
+				DayCalculator.ONE.calculateDay(new Timestamp(System.currentTimeMillis())).getTime(),
+				accountOption));
 	}
 	
 	@Override
@@ -71,10 +64,17 @@ public class TTLService implements ITTLService{
 	}
 	
 	@Override
-	public TTLDto createTTLDto(TTL ttl) {
+	public TTLDto createTTLDto(Date date) {
 		return TTLDto.builder()
-				.ttl(ttl.getTtl())
+				.ttl(date)
 				.build();
+	}
+	
+	@Override
+	public TTL createTTLEntity(Date date, AccountOption accountOption){
+		return TTL.builder()
+				.ttl(date)
+				.accountOption(accountOption).build();
 	}
 	
 	@Override

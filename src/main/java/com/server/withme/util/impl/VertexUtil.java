@@ -2,7 +2,6 @@ package com.server.withme.util.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.stereotype.Component;
 
@@ -38,7 +37,7 @@ public class VertexUtil implements IVertexUtil{
 		List<VertexDto> locationListChanged = new ArrayList<>();
 		
 		for(Location location : locationList) {		
-			VertexDto vertexDto = locationService.createVertexDto(location.getLatitude(),location.getLongitude());
+			VertexDto vertexDto = locationService.createVertexDto(location.getLatitude(),location.getLongitude(),true);
 			locationListChanged.add(vertexDto);
 		}
 		
@@ -50,7 +49,7 @@ public class VertexUtil implements IVertexUtil{
 		List<VertexDto> initSafeZoneListChanged = new ArrayList<>();
 		
 		for(InitSafeZone initSafeZone : initSafeZoneList) {		
-			VertexDto vertexDto = locationService.createVertexDto(initSafeZone.getLatitude(),initSafeZone.getLongitude());
+			VertexDto vertexDto = locationService.createVertexDto(initSafeZone.getLatitude(),initSafeZone.getLongitude(),true);
 			initSafeZoneListChanged.add(vertexDto);
 		}
 		
@@ -77,7 +76,7 @@ public class VertexUtil implements IVertexUtil{
 		List<VertexDto> safeZoneListChanged = new ArrayList<>();
 		
 		for(SafeZone initSafeZone : safeZoneList) {
-			VertexDto vertexDto = locationService.createVertexDto(initSafeZone.getLatitude(),initSafeZone.getLongitude());
+			VertexDto vertexDto = locationService.createVertexDto(initSafeZone.getLatitude(),initSafeZone.getLongitude(),true);
 			safeZoneListChanged.add(vertexDto);
 		}
 		
@@ -97,16 +96,16 @@ public class VertexUtil implements IVertexUtil{
 	public List<VertexDto> calculateVertex(List<VertexDto> initSafeZoneList){
 		
 		List<VertexDto> safeZoneList = new ArrayList<>();
-		Map<String,Double> minMaxMap = vertexCheckUtil.findMinMaxVertex(initSafeZoneList);
+		List<VertexDto> vertexDtoList = vertexCheckUtil.findMinMaxVertex(initSafeZoneList);
 		
-		double x= minMaxMap.get("maxLatitude");
+		double x= vertexDtoList.get(0).getLatitude();
 		Double perBoxSize = (double) (100/100000);
 		
-		while(x > minMaxMap.get("minLatitude")) {
+		while(x > vertexDtoList.get(1).getLatitude()) {
 			
-			double y=minMaxMap.get("minLongitude");
+			double y=vertexDtoList.get(0).getLongitude();
 			
-			while(y < minMaxMap.get("maxLongitude")) {
+			while(y < vertexDtoList.get(1).getLongitude()) {
 				this.createNewSafeZone(safeZoneList,x,y,perBoxSize);
 				y += perBoxSize;
 			}

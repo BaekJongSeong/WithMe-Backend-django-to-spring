@@ -17,7 +17,6 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-@AllArgsConstructor
 @NoArgsConstructor
 public class VertexDto {
 	@NotNull
@@ -25,4 +24,21 @@ public class VertexDto {
 
     @NotNull
     private Double longitude;
+    
+    private boolean TF;
+    
+    public VertexDto(Double latitude, Double longitude) {
+    	super();
+    	this.latitude = latitude;
+    	this.longitude = longitude;
+    }
+    
+    public VertexDto(Double latitude, Double longitude,boolean TF) {
+    	this(latitude,longitude);
+    	this.TF=TF;
+    }
+    
+    public boolean getTF() {
+    	return this.TF;
+    }
 }

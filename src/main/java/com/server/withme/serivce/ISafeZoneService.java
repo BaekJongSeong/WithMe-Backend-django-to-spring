@@ -18,7 +18,7 @@ import com.server.withme.model.LocationDto;
  */
 public interface ISafeZoneService {
 
-	public List<VertexDto> saveInitSafeZone(SafeZoneDto initSafeZoneDto, UUID accountId);
+	public VertexDto saveInitSafeZone(SafeZoneDto initSafeZoneDto, UUID accountId);
 	
 	public List<VertexDto> saveSafeZoneFirstTime(List<VertexDto> safeZone, UUID accountId);
 	
@@ -28,7 +28,7 @@ public interface ISafeZoneService {
 			
 	public List<InitSafeZone> loadInitSafeZoneList(AccountIdDto accountIdDto);
 	
-	public <T> SafeZoneInfoDto<T> craeteSafeZoneInfoDto(List<T> list,double trueOrFalse, int flag);
+	public <T> SafeZoneInfoDto<T> craeteSafeZoneInfoDto(List<T> list,boolean trueOrFalse, int flag);
 	
 	public List<InitSafeZone> findByAccountOptionIdOrThrow(Integer accountOptionId);
 	

@@ -57,10 +57,8 @@ public class AccountService implements IAccountService {
 	
 	@Override
 	public Account createAccount(SignupDto signupDto, String role) {
-		Timestamp timestamp = new Timestamp(System.currentTimeMillis());
-		
 		Account newAccount = Account.builder()
-	    			.timestamp(timestamp)
+	    			.timestamp(new Timestamp(System.currentTimeMillis()))
 	                .username(signupDto.getLoginDto().getUsername())
 	                .password(passwordEncoder.encode(signupDto.getLoginDto().getPassword()))
 	                .name(signupDto.getName())

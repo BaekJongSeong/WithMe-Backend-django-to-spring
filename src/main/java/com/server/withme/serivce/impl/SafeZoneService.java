@@ -2,7 +2,6 @@ package com.server.withme.serivce.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -22,6 +21,7 @@ import com.server.withme.repository.InitSafeZoneRepository;
 import com.server.withme.repository.SafeZoneRepository;
 import com.server.withme.repository.TTLRepository;
 import com.server.withme.serivce.IAccountOptionService;
+import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexCheckUtil;
@@ -45,7 +45,9 @@ public class SafeZoneService implements ISafeZoneService{
 	private final AccountOptionRepository accountOptionRepository;
 	
 	private final TTLRepository ttlRepository;
-		
+	
+	private final ILocationService locationService;
+	
 	private final ISafeZoneService safeZoneService;
 	
 	private final IAccountOptionService accountOptionService;
@@ -57,25 +59,22 @@ public class SafeZoneService implements ISafeZoneService{
 	private final IVertexCheckUtil vertexCheckUtil;
 	
 	@Override
-	public List<VertexDto> saveInitSafeZone(SafeZoneDto safeZoneDto, UUID accountId) {
+	public VertexDto saveInitSafeZone(SafeZoneDto safeZoneDto, UUID accountId) {
 		
 		List<VertexDto> initSafeZoneList = safeZoneDto.getSafeZone();
-		Map<String,String> result = vertexCheckUtil.checkSafeZoneMinSize(initSafeZoneList);
-		if(result.get("result").equals("false")) {
-			initSafeZoneList.add(VertexDto.builder().latitude(0.0).build());
-			return initSafeZoneList;
+		VertexDto vertexDto = vertexCheckUtil.checkSafeZoneMinSize(initSafeZoneList).get(0);
+		if(vertexDto.getTF()) {
+			AccountOption accountOption = accountOptionService.updateAccountOption(
+					accountId,vertexDto.getLatitude(),vertexDto.getLongitude());
+			
+			for(VertexDto vertex: initSafeZoneList) {
+				initSafeZoneRepository.save(InitSafeZone.builder()
+						.latitude(vertex.getLatitude())
+						.longitude(vertex.getLongitude())
+						.accountOption(accountOption).build());
+			}
 		}
-		AccountOption accountOption = accountOptionService.updateAccountOption(
-				accountId,Double.valueOf(result.get("maxLatitude")),Double.valueOf(result.get("minLongitude")));
-		
-		for(VertexDto vertex: initSafeZoneList) {
-			initSafeZoneRepository.save(InitSafeZone.builder()
-					.latitude(vertex.getLatitude())
-					.longitude(vertex.getLongitude())
-					.accountOption(accountOption).build());
-		}
-		initSafeZoneList.add(VertexDto.builder().latitude(1.0).build());
-		return initSafeZoneList;
+		return locationService.createVertexDto(1.0,1.0, vertexDto.getTF());
 	}
 	
 	@Override
@@ -144,11 +143,11 @@ public class SafeZoneService implements ISafeZoneService{
 	}
 	
 	@Override
-	public <T> SafeZoneInfoDto<T> craeteSafeZoneInfoDto(List<T> list, double trueOrFalse, int flag){
+	public <T> SafeZoneInfoDto<T> craeteSafeZoneInfoDto(List<T> list, boolean trueOrFalse, int flag){
 		SafeZoneInfoDto<T> safeZoneInfoDto = new SafeZoneInfoDto<>();
 		String message="";
 		
-		if(trueOrFalse> 0.0) 
+		if(trueOrFalse) 
 			message = (flag==1) ? "location에 해당하는 safeZone의 TTL이 업데이트 되었습니다." : "등록이 완료되었습니다.";
 		 else 
 			message = (flag==1) ? "새로운 safeZone이 생성되었습니다." : "최소 size 또는 같은 위치 반복을 위반하여 등록되지 않았습니다.";
