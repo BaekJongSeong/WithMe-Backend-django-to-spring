@@ -37,11 +37,11 @@ public class SchedularController {
 		schedularService.updateSafeZoneBySchedular(checkedAccountList);
 	}
 
-	@GetMapping("/schedular/safe-zone")
+	@GetMapping("/schedular/expired-ttl")
 	@Scheduled(cron = "0 15 02 * * *")
     public void deleteExpireTTL() {
 		List<Account> accountList = accountService.findAllAccount();
 		List<Account> checkedAccountList = accountService.checkSevenDayOver(accountList);
-		schedularService.updateSafeZoneBySchedular(checkedAccountList);
+		schedularService.deleteExpireTTLBySchedular(checkedAccountList);
 	}
 }

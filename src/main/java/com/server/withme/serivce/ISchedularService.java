@@ -11,5 +11,6 @@ import com.server.withme.entity.Account;
 public interface ISchedularService {
 	
 	public void updateSafeZoneBySchedular(List<Account> checkedAccountList);
-
+	
+	public void deleteExpireTTLBySchedular(List<Account> checkedAccountList);
 }

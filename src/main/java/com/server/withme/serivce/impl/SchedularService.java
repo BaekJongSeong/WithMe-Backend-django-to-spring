@@ -74,4 +74,8 @@ public class SchedularService implements ISchedularService{
 		}
 	}
 	
+	@Override
+	public void deleteExpireTTLBySchedular(List<Account> checkedAccountList) {
+		
+	}
 }
