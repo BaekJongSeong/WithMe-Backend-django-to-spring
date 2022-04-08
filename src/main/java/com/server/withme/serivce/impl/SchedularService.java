@@ -1,7 +1,9 @@
 package com.server.withme.serivce.impl;
 
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
 
@@ -76,6 +78,34 @@ public class SchedularService implements ISchedularService{
 	
 	@Override
 	public void deleteExpireTTLBySchedular(List<Account> checkedAccountList) {
-		
+		List<AccountOption> accountOptionList = accountOptionService.findAllFetchAccountOption(checkedAccountList);
+		for(AccountOption accountOption: accountOptionList) {
+			List<TTL> ttlList = ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
+			
+			List<List<VertexDto>> safeZoneList = new ArrayList<>();
+			List<Integer> ttlIdList = new ArrayList<>();
+			for(TTL ttl: ttlList)
+				safeZoneList.add(vertexUtil.convertToVertexDto(safeZoneService.findByTTLIdOrThrow(ttl.getId())));
+			
+			int count=0;double x=0,y=0;
+			for(int idx=0; idx< ttlList.size();idx++) {
+				if(ttlList.get(idx).getTtl().getTime() < new Timestamp(System.currentTimeMillis()).getTime()) {
+					count++;
+					safeZoneList.remove(idx);ttlIdList.add(ttlList.get(idx).getId());
+					
+					List<VertexDto> resultDto = vertexCheckUtil.checkSafeZoneMinSize(
+							safeZoneList.stream()
+					        .flatMap(List::stream)
+					        .collect(Collectors.toList()));
+					
+					x=resultDto.get(0).getLatitude();
+					y=resultDto.get(0).getLongitude();
+					if(count %50 ==0 && count!=0 && !resultDto.get(0).getTF())
+						break;			
+				}
+			}
+			ttlService.deleteAllTTLById(ttlIdList);
+			accountOptionService.updateAccountOption(accountOption.getAccount().getAccountId(),x,y);
+		}
 	}
 }
