@@ -16,6 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.server.withme.enumclass.IVertexDto;
+import com.server.withme.model.LocationDto;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -67,5 +68,13 @@ public class Location implements Serializable, IVertexDto{
     
     @ManyToOne
     private AccountOption accountOption;
-	
+    
+	 public static Location createLocationEntity(LocationDto locationDto, AccountOption accountOption) {
+	    return Location.builder()
+		.timestamp(locationDto.getTtlDto().getTtl())
+		.latitude(locationDto.getVertexDto().getLatitude())
+		.longitude(locationDto.getVertexDto().getLongitude())
+		.accountOption(accountOption)
+		.build();
+	 }
 }

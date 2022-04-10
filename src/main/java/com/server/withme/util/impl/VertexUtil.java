@@ -11,7 +11,6 @@ import com.server.withme.entity.SafeZone;
 import com.server.withme.enumclass.IVertexDto;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
-import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.util.IVertexCheckUtil;
 import com.server.withme.util.IVertexUtil;
@@ -27,16 +26,14 @@ import lombok.RequiredArgsConstructor;
 public class VertexUtil implements IVertexUtil{
 		
 	private final ISafeZoneService safeZoneService;
-	
-	private final ILocationService locationService;
-		
+			
 	private final IVertexCheckUtil vertexCheckUtil;
 	
 	@Override
 	public <T extends IVertexDto> List<VertexDto> convertToVertexDto(List<T> list){
 		List<VertexDto> vertexDtoList = new ArrayList<>();
 		for(T item : list)
-			vertexDtoList.add(locationService.createVertexDto(item.getLatitude(),item.getLongitude(),true));
+			vertexDtoList.add(new VertexDto(item.getLatitude(),item.getLongitude(),true));
 		return vertexDtoList;
 	}
 	

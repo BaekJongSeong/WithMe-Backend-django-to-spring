@@ -13,7 +13,6 @@ import com.server.withme.entity.SafeZone;
 import com.server.withme.entity.TTL;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
-import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexCheckUtil;
 
@@ -29,9 +28,7 @@ import lombok.RequiredArgsConstructor;
 public class VertexCheckUtil implements IVertexCheckUtil{
 
 	private final ITTLService ttlService;
-	
-	private final ILocationService locationService;
-	
+		
 	public boolean checkIfTrue(List<VertexDto> vertexDtoList) {
 		return (vertexDtoList.get(1).getLongitude() - vertexDtoList.get(0).getLongitude() > 0.0423) ? true: false;
 	}
@@ -56,8 +53,8 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 		safeZoneList.sort(Comparator.comparing(VertexDto::getLongitude).reversed());
 		double maxY = safeZoneList.get(0).getLongitude(); double minY = safeZoneList.get(safeZoneList.size()-1).getLongitude();
 		
-		VertexDto vertex1 = locationService.createVertexDto(maxX,minY, true);
-		VertexDto vertex2 =locationService.createVertexDto(minX,maxY,true); 		
+		VertexDto vertex1 = new VertexDto(maxX,minY, true);
+		VertexDto vertex2 = new VertexDto(minX,maxY,true); 		
 		return new ArrayList<VertexDto>(Arrays.asList(vertex1,vertex2));
 	}
 	

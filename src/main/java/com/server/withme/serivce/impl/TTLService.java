@@ -1,7 +1,6 @@
 package com.server.withme.serivce.impl;
 
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -10,7 +9,6 @@ import org.springframework.stereotype.Service;
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.TTL;
 import com.server.withme.enumclass.DayCalculator;
-import com.server.withme.model.TTLDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.repository.AccountOptionRepository;
 import com.server.withme.repository.TTLRepository;

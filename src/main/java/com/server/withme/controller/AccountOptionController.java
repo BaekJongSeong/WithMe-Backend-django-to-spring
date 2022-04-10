@@ -32,7 +32,7 @@ public class AccountOptionController {
 	            @Validated @RequestBody SignupDto signupDto
 	    ) {
 		 	AccountOption accountOption = accountOptionService.signUpOption(signupDto);
-		 	AccountOptionDto accountOptionDto = accountOptionService.createAccountOptionDto(accountOption);		 	
+		 	AccountOptionDto accountOptionDto = AccountOptionDto.createAccountOptionDto(accountOption);		 	
 	        return new ResponseEntity<>(accountOptionDto,new HttpHeaders(), HttpStatus.OK);
 	    }
 }

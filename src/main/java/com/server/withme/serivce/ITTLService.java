@@ -1,10 +1,8 @@
 package com.server.withme.serivce;
-import java.util.Date;
 import java.util.List;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.TTL;
-import com.server.withme.model.TTLDto;
 import com.server.withme.model.VertexDto;
 /**
  * Interface for TTLService

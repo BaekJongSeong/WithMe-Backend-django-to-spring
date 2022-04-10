@@ -5,7 +5,6 @@ import java.util.UUID;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import com.server.withme.entity.Account;
-import com.server.withme.model.AccountDto;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LoginDto;
 import com.server.withme.model.SignupDto;
@@ -30,8 +29,6 @@ public interface IAccountService extends UserDetailsService {
     
     public List<Account> checkSevenDayOver(List<Account> accountList);
     
-    public AccountDto createAccountDto(Account account);
-
     public Account findByAccountIdOrThrow(UUID accountId);
     
     public Account findByUsernameOrThrow(String username);

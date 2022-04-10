@@ -54,7 +54,7 @@ public class AccountController {
             @Validated @RequestBody AccountIdDto accountIdDto
     ) {
     	Account account = accountService.modifyAccount(accountIdDto);
-    	AccountDto accountDto =accountService.createAccountDto(account);
+    	AccountDto accountDto =AccountDto.createAccountDto(account);
         return new ResponseEntity<>(accountDto,new HttpHeaders(),HttpStatus.OK);
     }
     

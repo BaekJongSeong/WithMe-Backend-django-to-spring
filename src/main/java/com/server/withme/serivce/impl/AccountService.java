@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import com.server.withme.entity.Account;
 import com.server.withme.enumclass.DayCalculator;
-import com.server.withme.model.AccountDto;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LoginDto;
 import com.server.withme.model.SignupDto;
@@ -38,14 +37,7 @@ public class AccountService implements IAccountService {
     
 	@Override
     public UserDetails loadUserByUsername(String username) {
-        Account account = this.findByUsernameOrThrow(username);
-        
-        return Account.builder()
-                .accountId(account.getAccountId())
-                .username(account.getUsername())
-                .timestamp(account.getTimestamp())
-                .name(account.getName())
-                .email(account.getEmail()).build();
+        return this.findByUsernameOrThrow(username);
     }
 	
 	@Override
@@ -57,17 +49,8 @@ public class AccountService implements IAccountService {
 	
 	@Override
 	public Account createAccount(SignupDto signupDto, String role) {
-		Account newAccount = Account.builder()
-	    			.timestamp(new Timestamp(System.currentTimeMillis()))
-	                .username(signupDto.getLoginDto().getUsername())
-	                .password(passwordEncoder.encode(signupDto.getLoginDto().getPassword()))
-	                .name(signupDto.getName())
-	                .email(signupDto.getEmail())
-	                .emailVerified(false)
-	                .unLocked(false)
-	                .accountType(role).build();
-
-	    return accountRepository.save(newAccount);
+	    return accountRepository.save(Account.createAccountEntity(signupDto,
+	    		passwordEncoder.encode(signupDto.getLoginDto().getPassword()),role));
 	}
 	
 	@Override
@@ -83,9 +66,7 @@ public class AccountService implements IAccountService {
 	public AccountIdDto getAccountId(LoginDto loginDto) {
 		Account account = this.findByUsernameOrThrow(loginDto.getUsername());
 		
-		return AccountIdDto.builder()
-				.accountId(account.getAccountId())
-				.build();
+		return AccountIdDto.builder().accountId(account.getAccountId()).build();
 	}
 	
 	@Override
@@ -104,15 +85,6 @@ public class AccountService implements IAccountService {
 				checkedAccountList.add(account);
 		}
 		return checkedAccountList;
-	}
-	
-	@Override
-	public AccountDto createAccountDto(Account account) {
-		return AccountDto.builder()
-			    .timestamp(account.getTimestamp())
-			    .name(account.getName())
-			    .emailVerified(account.getEmailVerified())
-			    .accountType(account.getAccountType()).build();
 	}
 	
 	@Override

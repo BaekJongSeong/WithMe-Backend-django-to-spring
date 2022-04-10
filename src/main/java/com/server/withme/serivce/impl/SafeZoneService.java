@@ -14,14 +14,12 @@ import com.server.withme.entity.TTL;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.SafeZoneDto;
-import com.server.withme.model.SafeZoneInfoDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.repository.AccountOptionRepository;
 import com.server.withme.repository.InitSafeZoneRepository;
 import com.server.withme.repository.SafeZoneRepository;
 import com.server.withme.repository.TTLRepository;
 import com.server.withme.serivce.IAccountOptionService;
-import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexCheckUtil;
@@ -45,9 +43,7 @@ public class SafeZoneService implements ISafeZoneService{
 	private final AccountOptionRepository accountOptionRepository;
 	
 	private final TTLRepository ttlRepository;
-	
-	private final ILocationService locationService;
-	
+		
 	private final ISafeZoneService safeZoneService;
 	
 	private final IAccountOptionService accountOptionService;
@@ -70,7 +66,7 @@ public class SafeZoneService implements ISafeZoneService{
 			for(VertexDto vertex: initSafeZoneList) 
 				initSafeZoneRepository.save(InitSafeZone.createInitSafeZoneEntity(vertex,accountOption));
 		}
-		return locationService.createVertexDto(1.0,1.0, vertexDto.getTF());
+		return new VertexDto(1.0,1.0, vertexDto.getTF());
 	}
 	
 	@Override

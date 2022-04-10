@@ -19,7 +19,5 @@ public interface ILocationService {
 		
 	public VertexDto checkInAndOut(LocationDto locationDto, UUID accountId);
 	
-	public VertexDto createVertexDto(double latitude, double longitude, boolean TF);
-	
 	public List<Location> findByAccountOptionIdOrThrow(Integer accountOptionId);
 }

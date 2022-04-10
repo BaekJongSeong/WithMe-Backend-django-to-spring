@@ -4,6 +4,7 @@ import java.util.Date;
 import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.server.withme.entity.Account;
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -44,4 +45,12 @@ public class AccountDto {
     
     @NotNull
     private String accountType;
+    
+    public static AccountDto createAccountDto(Account account) {
+		return AccountDto.builder()
+			    .timestamp(account.getTimestamp())
+			    .name(account.getName())
+			    .emailVerified(account.getEmailVerified())
+			    .accountType(account.getAccountType()).build();
+	}
 }

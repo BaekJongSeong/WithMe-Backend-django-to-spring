@@ -2,6 +2,7 @@ package com.server.withme.model;
 
 import java.util.UUID;
 
+import com.server.withme.entity.AccountOption;
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -42,4 +43,17 @@ public class AccountOptionDto {
 	 
 	 @NotNull
 	 private UUID accountId;
+	 
+	public static AccountOptionDto createAccountOptionDto(AccountOption accountOption) {
+			return AccountOptionDto.builder()
+				.id(accountOption.getId())
+				.boxSize(accountOption.getBoxSize())
+				.distance(accountOption.getDistance())
+				.initSafeZone(accountOption.getInitSafeZone())
+				.safeMove(accountOption.getSafeMove())
+				.xPoint(accountOption.getXPoint())
+				.yPoint(accountOption.getYPoint())
+				.accountId(accountOption.getAccount().getAccountId())
+				.build();
+		}
 }

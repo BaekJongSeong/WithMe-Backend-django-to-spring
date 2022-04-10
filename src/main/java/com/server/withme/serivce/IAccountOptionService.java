@@ -5,7 +5,6 @@ import java.util.UUID;
 
 import com.server.withme.entity.Account;
 import com.server.withme.entity.AccountOption;
-import com.server.withme.model.AccountOptionDto;
 import com.server.withme.model.SignupDto;
 
 /**
@@ -22,8 +21,6 @@ public interface IAccountOptionService {
 	public AccountOption updateSafeMove(UUID accountId);
 	
 	public List<AccountOption> findAllFetchAccountOption(List<Account> checkedAccountList);
-	
-	public AccountOptionDto createAccountOptionDto(AccountOption accountOption);
-	
+		
 	public AccountOption findByAccountIdOrThrow(UUID accountId);
 }

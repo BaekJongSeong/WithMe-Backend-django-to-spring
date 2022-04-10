@@ -83,4 +83,15 @@ public class AccountOption implements Serializable {
 	 
 	 @OneToOne
 	 private Account account;
+	 
+	 public static AccountOption createAccountOptionEntity(Account account) {
+		 return AccountOption.builder()
+					.boxSize(100)
+					.distance(0.0)
+					.initSafeZone(false)
+					.safeMove(false)
+					.xPoint(null)
+					.yPoint(null)
+					.account(account).build();
+	 }
 }

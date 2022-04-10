@@ -6,7 +6,6 @@ import java.util.UUID;
 import com.server.withme.entity.InitSafeZone;
 import com.server.withme.entity.SafeZone;
 import com.server.withme.model.SafeZoneDto;
-import com.server.withme.model.SafeZoneInfoDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LocationDto;

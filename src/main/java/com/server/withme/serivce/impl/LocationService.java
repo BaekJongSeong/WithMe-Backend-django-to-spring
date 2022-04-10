@@ -55,15 +55,10 @@ public class LocationService implements ILocationService{
 	public VertexDto saveLocation(LocationDto locationDto, UUID accountId) {
 		
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
-		Location location =Location.builder()
-					.timestamp(locationDto.getTtlDto().getTtl())
-					.latitude(locationDto.getVertexDto().getLatitude())
-					.longitude(locationDto.getVertexDto().getLongitude())
-					.accountOption(accountOption)
-					.build();
+		Location location = Location.createLocationEntity(locationDto, accountOption);
 	
 		locationRepository.save(location);
-		return this.createVertexDto(locationDto.getVertexDto().getLatitude(),
+		return new VertexDto(locationDto.getVertexDto().getLatitude(),
 				locationDto.getVertexDto().getLongitude(),this.checkLatestLocation(locationDto,accountId));
 	}
 	
@@ -80,24 +75,8 @@ public class LocationService implements ILocationService{
 				.latitude(locationDto.getVertexDto().getLatitude())
 				.longitude(locationDto.getVertexDto().getLongitude()).build(), totalSafeZoneList, ttlList);
 
-		return this.createVertexDto(locationDto.getVertexDto().getLatitude(),
+		return new VertexDto(locationDto.getVertexDto().getLatitude(),
 				locationDto.getVertexDto().getLongitude(), TF);
-	}
-	
-	
-	public VertexDto createVertexDto(double latitude, double longitude) {
-		return VertexDto.builder()
-		.latitude(latitude)
-		.longitude(longitude)
-		.build();
-	}
-	
-	@Override
-	public VertexDto createVertexDto(double latitude, double longitude, boolean TF) {
-		return VertexDto.builder()
-		.latitude(latitude)
-		.longitude(longitude).TF(TF)
-		.build();
 	}
 	
 	@Override

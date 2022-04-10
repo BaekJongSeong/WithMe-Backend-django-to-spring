@@ -1,6 +1,7 @@
 package com.server.withme.entity;
 
 import java.io.Serializable;
+import java.sql.Timestamp;
 import java.util.Collection;
 import java.util.Date;
 import java.util.UUID;
@@ -22,6 +23,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.server.withme.model.SignupDto;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -47,7 +49,7 @@ import lombok.Setter;
 public class Account implements UserDetails, Serializable {
 
 	private static final long serialVersionUID = 1L;
-
+	
 	@Id
     @GeneratedValue
     @Column(name = "account_id")
@@ -117,6 +119,18 @@ public class Account implements UserDetails, Serializable {
 	public boolean isEnabled() {
 		return (emailVerified && unLocked);
 	}
+	
+	 public static Account createAccountEntity(SignupDto signupDto, String password, String role) {
+		return Account.builder()
+			.timestamp(new Timestamp(System.currentTimeMillis()))
+         .username(signupDto.getLoginDto().getUsername())
+         .password(password)
+         .name(signupDto.getName())
+         .email(signupDto.getEmail())
+         .emailVerified(false)
+         .unLocked(false)
+         .accountType(role).build();
+	 }
     
     
 }
