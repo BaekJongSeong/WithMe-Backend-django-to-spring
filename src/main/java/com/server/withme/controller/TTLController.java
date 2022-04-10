@@ -52,7 +52,7 @@ public class TTLController {
 				safeZoneService.loadInitSafeZoneList(accountIdDto));
 		
 		ttlService.saveTTLFirstTime(vertexDtoList,accountOption);
-		TTLDto ttlDto = ttlService.createTTLDto(DayCalculator.ZERO.calculateDay(new Timestamp(System.currentTimeMillis())).getTime());
+		TTLDto ttlDto = TTLDto.createTTLDto(DayCalculator.ZERO.calculateDay(new Timestamp(System.currentTimeMillis())).getTime());
         return new ResponseEntity<>(ttlDto,new HttpHeaders(),HttpStatus.OK);
     }
 	

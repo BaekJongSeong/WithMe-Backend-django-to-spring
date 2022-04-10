@@ -67,12 +67,8 @@ public class SafeZoneService implements ISafeZoneService{
 			AccountOption accountOption = accountOptionService.updateAccountOption(
 					accountId,vertexDto.getLatitude(),vertexDto.getLongitude());
 			
-			for(VertexDto vertex: initSafeZoneList) {
-				initSafeZoneRepository.save(InitSafeZone.builder()
-						.latitude(vertex.getLatitude())
-						.longitude(vertex.getLongitude())
-						.accountOption(accountOption).build());
-			}
+			for(VertexDto vertex: initSafeZoneList) 
+				initSafeZoneRepository.save(InitSafeZone.createInitSafeZoneEntity(vertex,accountOption));
 		}
 		return locationService.createVertexDto(1.0,1.0, vertexDto.getTF());
 	}
@@ -89,10 +85,7 @@ public class SafeZoneService implements ISafeZoneService{
 				if(count% 4 == 0 && count != 0)
 					break;
 				//spring batch bulk로 create하기
-				safeZoneRepository.save(SafeZone.builder()
-					.latitude(safeZone.get(count).getLatitude())
-					.longitude(safeZone.get(count).getLongitude())
-					.ttl(ttl).build());	
+				safeZoneRepository.save(SafeZone.createSafeZoneEntity(safeZone.get(count),ttl));	
 				count++;
 			}
 		}
@@ -125,10 +118,7 @@ public class SafeZoneService implements ISafeZoneService{
 		List<VertexDto> newSafeZoneList = vertexUtil.createSafeZoneByLocation(accountOption,locationDto);
 		
 		for(VertexDto safeZone: newSafeZoneList)
-			safeZoneRepository.save(SafeZone.builder()
-					.latitude(safeZone.getLatitude())
-					.longitude(safeZone.getLongitude())
-					.ttl(ttl).build());	
+			safeZoneRepository.save(SafeZone.createSafeZoneEntity(safeZone,ttl));	
 		
 		return newSafeZoneList;
 	}
@@ -137,21 +127,6 @@ public class SafeZoneService implements ISafeZoneService{
 	public List<InitSafeZone> loadInitSafeZoneList(AccountIdDto accountIdDto){
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
 		return this.findByAccountOptionIdOrThrow(accountOption.getId());
-	}
-	
-	@Override
-	public <T> SafeZoneInfoDto<T> craeteSafeZoneInfoDto(List<T> list, boolean trueOrFalse, int flag){
-		SafeZoneInfoDto<T> safeZoneInfoDto = new SafeZoneInfoDto<>();
-		String message="";
-		
-		if(trueOrFalse) 
-			message = (flag==1) ? "location에 해당하는 safeZone의 TTL이 업데이트 되었습니다." : "등록이 완료되었습니다.";
-		 else 
-			message = (flag==1) ? "새로운 safeZone이 생성되었습니다." : "최소 size 또는 같은 위치 반복을 위반하여 등록되지 않았습니다.";
-		
-		safeZoneInfoDto.setMessage(message);
-		safeZoneInfoDto.setData(list);
-		return safeZoneInfoDto;
 	}
 
 	@Override

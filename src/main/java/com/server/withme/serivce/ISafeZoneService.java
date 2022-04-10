@@ -27,9 +27,7 @@ public interface ISafeZoneService {
 	public List<VertexDto> createSafeZoneByLocation (UUID accountId,LocationDto locationDto);
 			
 	public List<InitSafeZone> loadInitSafeZoneList(AccountIdDto accountIdDto);
-	
-	public <T> SafeZoneInfoDto<T> craeteSafeZoneInfoDto(List<T> list,boolean trueOrFalse, int flag);
-	
+		
 	public List<InitSafeZone> findByAccountOptionIdOrThrow(Integer accountOptionId);
 	
 	public List<SafeZone> findByTTLIdOrThrow(Integer ttlId);

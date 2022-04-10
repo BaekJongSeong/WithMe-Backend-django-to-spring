@@ -10,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.server.withme.enumclass.IVertexDto;
+import com.server.withme.model.VertexDto;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -56,5 +57,12 @@ public class InitSafeZone implements Serializable,IVertexDto {
 	 
 	 @ManyToOne
 	 private AccountOption accountOption;
+	 
+	 public static InitSafeZone createInitSafeZoneEntity(VertexDto safeZone, AccountOption accountOption) {
+			return InitSafeZone.builder()
+			.latitude(safeZone.getLatitude())
+			.longitude(safeZone.getLongitude())
+			.accountOption(accountOption).build();
+		 }
 
 }

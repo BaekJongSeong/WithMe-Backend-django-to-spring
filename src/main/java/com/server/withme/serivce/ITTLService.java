@@ -21,10 +21,6 @@ public interface ITTLService {
 		
 	public void deleteAllTTLById(List<Integer> ttlIdList);
 	
-	public TTLDto createTTLDto(Date date);
-	
-	public TTL createTTLEntity(Date date, AccountOption accountOption);
-	
 	public TTL findByTTLIdOrThrow(int index);
 	
 	public List<TTL> findByAccountOptionIdOrThrow(Integer accountOptionId);

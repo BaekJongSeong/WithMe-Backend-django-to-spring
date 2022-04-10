@@ -34,16 +34,14 @@ import lombok.RequiredArgsConstructor;
 public class LocationController {
 	
 	private final ILocationService locationService;
-	
-	private final ISafeZoneService safeZoneService;
-	
+		
 	@PostMapping("/location/{accountId}")
     public ResponseEntity<SafeZoneInfoDto<VertexDto>> saveLocation (
     		@PathVariable UUID accountId,
             @Validated @RequestBody LocationDto locationDto
     ) {
 		VertexDto location = locationService.saveLocation(locationDto,accountId);
-		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService
+		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto
 				.craeteSafeZoneInfoDto(new ArrayList<VertexDto>(Arrays.asList(location)),location.getTF(),0);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
 	}
@@ -54,7 +52,7 @@ public class LocationController {
             @Validated @RequestBody LocationDto locationDto
     ) {
 		VertexDto location = locationService.checkInAndOut(locationDto,accountId);
-		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService
+		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto
 				.craeteSafeZoneInfoDto(new ArrayList<VertexDto>(Arrays.asList(location)),location.getTF(),1);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
 	}

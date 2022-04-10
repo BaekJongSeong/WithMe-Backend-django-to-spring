@@ -38,14 +38,14 @@ public class TTLService implements ITTLService{
 	public void saveTTLFirstTime(List<VertexDto> initSafeZoneList, AccountOption accountOption) {
 			Integer count = vertexCheckUtil.countSafeZone(initSafeZoneList);
 			for(int idx=0; idx< count; idx++)
-				ttlRepository.save(createTTLEntity(
+				ttlRepository.save(TTL.createTTLEntity(
 						DayCalculator.SEVEN.calculateDay(new Timestamp(System.currentTimeMillis())).getTime(),
 						accountOption));
 	}
 	
 	@Override 
 	public TTL saveTTL(AccountOption accountOption) {
-		return ttlRepository.save(createTTLEntity(
+		return ttlRepository.save(TTL.createTTLEntity(
 				DayCalculator.ONE.calculateDay(new Timestamp(System.currentTimeMillis())).getTime(),
 				accountOption));
 	}
@@ -62,21 +62,7 @@ public class TTLService implements ITTLService{
 		for(Integer ttlId : ttlIdList)
 			ttlRepository.deleteById(ttlId);
 	}
-	
-	@Override
-	public TTLDto createTTLDto(Date date) {
-		return TTLDto.builder()
-				.ttl(date)
-				.build();
-	}
-	
-	@Override
-	public TTL createTTLEntity(Date date, AccountOption accountOption){
-		return TTL.builder()
-				.ttl(date)
-				.accountOption(accountOption).build();
-	}
-	
+
 	@Override
 	public TTL findByTTLIdOrThrow(int index){
 		return ttlRepository.findById(index).orElseThrow(() 

@@ -46,7 +46,7 @@ public class SafeZoneController {
             @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
 		VertexDto vertexDto = safeZoneService.saveInitSafeZone(safeZoneDto, accountId);
-		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = safeZoneService.craeteSafeZoneInfoDto(
+		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto.craeteSafeZoneInfoDto(
 					new ArrayList<VertexDto>(Arrays.asList(vertexDto)), vertexDto.getTF(),0);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
     }

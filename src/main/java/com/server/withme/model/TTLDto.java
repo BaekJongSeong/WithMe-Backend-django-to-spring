@@ -23,4 +23,10 @@ public class TTLDto {
 	
 	@NotNull
 	private Date ttl;
+	
+	public static TTLDto createTTLDto(Date date) {
+		return TTLDto.builder()
+				.ttl(date)
+				.build();
+	}
 }

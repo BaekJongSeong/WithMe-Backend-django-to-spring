@@ -1,6 +1,7 @@
 package com.server.withme.entity;
 
 import java.io.Serializable;
+
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -9,6 +10,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 import com.server.withme.enumclass.IVertexDto;
+import com.server.withme.model.VertexDto;
 
 import io.swagger.annotations.ApiModel;
 import lombok.AllArgsConstructor;
@@ -55,4 +57,11 @@ public class SafeZone implements Serializable, IVertexDto {
 	 
 	 @ManyToOne
 	 private TTL ttl;
+	 
+	 public static SafeZone createSafeZoneEntity(VertexDto safeZone, TTL ttl) {
+		return SafeZone.builder()
+		.latitude(safeZone.getLatitude())
+		.longitude(safeZone.getLongitude())
+		.ttl(ttl).build();
+	 }
 }

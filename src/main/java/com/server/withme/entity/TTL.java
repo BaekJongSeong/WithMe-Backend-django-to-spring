@@ -65,4 +65,11 @@ public class TTL implements Serializable {
 	 
 	 @ManyToOne
 	 private AccountOption accountOption;
+	 
+	 
+	 public static TTL createTTLEntity(Date date, AccountOption accountOption){
+			return TTL.builder()
+					.ttl(date)
+					.accountOption(accountOption).build();
+		}
 }
