@@ -44,4 +44,6 @@ public class SchedularController {
 		List<Account> checkedAccountList = accountService.checkSevenDayOver(accountList);
 		schedularService.deleteExpireTTLBySchedular(checkedAccountList);
 	}
+	
+	
 }
