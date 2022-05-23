@@ -69,6 +69,7 @@ public class AccountOption implements Serializable {
 	 @ApiModelProperty(notes = "standard point for longitude")
 	 private Double yPoint;
 	 
+	 //cascade = CascadeType.ALL => 상태변화를 전이
 	 @OneToMany(mappedBy = "accountOption", fetch=FetchType.LAZY , cascade = CascadeType.ALL)
 	 private List<Location> loctionList = new LinkedList<>();
 	 
@@ -81,7 +82,7 @@ public class AccountOption implements Serializable {
 	 @OneToMany(mappedBy = "accountOption", fetch=FetchType.LAZY , cascade = CascadeType.ALL)
 	 private List<InitSafeZone> initSafeZoneList = new LinkedList<>();
 	 
-	 @OneToOne
+	 @OneToOne(fetch = FetchType.LAZY)
 	 private Account account;
 	 
 	 public static AccountOption createAccountOptionEntity(Account account) {

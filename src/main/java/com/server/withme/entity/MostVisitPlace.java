@@ -3,6 +3,7 @@ package com.server.withme.entity;
 import java.io.Serializable;
 
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,6 +46,6 @@ public class MostVisitPlace implements Serializable {
 	    
 	 private Double longitude;
 	 
-	 @ManyToOne
+	 @ManyToOne(fetch = FetchType.LAZY)
 	 private AccountOption accountOption;
 }

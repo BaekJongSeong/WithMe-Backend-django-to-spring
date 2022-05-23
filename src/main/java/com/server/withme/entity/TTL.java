@@ -63,7 +63,7 @@ public class TTL implements Serializable {
 	 @OneToMany(mappedBy="ttl", fetch=FetchType.LAZY, cascade = CascadeType.ALL)
 	 private List<SafeZone> safeZoneList = new LinkedList<>();
 	 
-	 @ManyToOne
+	 @ManyToOne(fetch = FetchType.LAZY)
 	 private AccountOption accountOption;
 	 
 	 

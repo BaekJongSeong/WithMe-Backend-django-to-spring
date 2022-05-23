@@ -58,7 +58,6 @@ public class AccountService implements IAccountService {
 		Account account = this.findByAccountIdOrThrow(accountIdDto.getAccountId());
 		account.setEmailVerified(true);
 		account.setUnLocked(true);
-		
 		return accountRepository.save(account);
 	}
 	
