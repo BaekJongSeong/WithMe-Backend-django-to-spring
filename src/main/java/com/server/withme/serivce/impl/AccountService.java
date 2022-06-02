@@ -37,7 +37,7 @@ public class AccountService implements IAccountService {
     
 	@Override
     public UserDetails loadUserByUsername(String username) {
-        return this.findByUsernameOrThrow(username);
+        return (UserDetails) this.findByUsernameOrThrow(username);
     }
 	
 	@Override

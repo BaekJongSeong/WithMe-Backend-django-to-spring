@@ -11,8 +11,11 @@ import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.Location;
 import com.server.withme.entity.SafeZone;
 import com.server.withme.entity.TTL;
+import com.server.withme.enumclass.DayCalculator;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
+import com.server.withme.repository.AccountOptionRepository;
+import com.server.withme.repository.TTLRepository;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexCheckUtil;
 
@@ -26,8 +29,10 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class VertexCheckUtil implements IVertexCheckUtil{
-
-	private final ITTLService ttlService;
+	
+	private final TTLRepository ttlRepository;
+	
+	private final AccountOptionRepository accountOptionRepository;
 		
 	public boolean checkIfTrue(List<VertexDto> vertexDtoList) {
 		return (vertexDtoList.get(1).getLongitude() - vertexDtoList.get(0).getLongitude() > 0.0423) ? true: false;
@@ -127,7 +132,7 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 		
 		List<List<VertexDto>> twoDimensionList = new ArrayList<>();
 		List<Integer> deleteTTLList = new ArrayList<>();
-		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
+		List<TTL> ttlList= accountOptionRepository.findByFetchTTL(accountOption.getId()).get().getTtlList();
 		
 		for(int idx=0; idx<totalList.size();idx+=4)
 			twoDimensionList.add(totalList.subList(idx, idx+4));
@@ -145,7 +150,8 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 				deleteTTLList.add(ttlList.get(idx).getId());
 			}
 		}	
-		ttlService.deleteAllTTLById(deleteTTLList);
+		for(Integer ttlId : deleteTTLList)
+			ttlRepository.deleteById(ttlId);
 		return twoDimensionList;
 	}
 	
@@ -185,7 +191,9 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 			
             if (count % 2 == 0) status=2;
             if (status == 1) {
-            	ttlService.ttlUpdate(ttlList.get(countVertex),countVertex);
+            	TTL ttlOld = ttlRepository.findById(countVertex).get();
+            	ttlOld.setTtl(DayCalculator.ONE.calculateDay(ttlOld.getTtl()).getTime());
+            	ttlRepository.save(ttlOld);
             	break;
 			}
 		}

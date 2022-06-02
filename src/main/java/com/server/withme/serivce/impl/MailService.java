@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class MailService implements IMailService{
+	
 
     private final JavaMailSender javaMailSender;
     

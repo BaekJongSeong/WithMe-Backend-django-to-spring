@@ -33,18 +33,14 @@ import lombok.RequiredArgsConstructor;
 public class LocationService implements ILocationService{
 		
 	private final LocationRepository locationRepository;
-	
-	private final ITTLService ttlService;
-	
-	private final ISafeZoneService safeZoneService;
-		
+				
 	private final AccountOptionRepository accountOptionRepository;
 
 	private final IVertexCheckUtil vertexCheckUtil;
 	
 	@Override
 	public boolean checkLatestLocation(LocationDto locationDto , AccountOption accountOption) {
-		Location location = locationRepository.findByFetchLatest(accountOption.getId());
+		Location location = locationRepository.findByAccountOption_Id(accountOption.getId());
 		return vertexCheckUtil.checkLatestLocation(locationDto,location);
 	}
 	
@@ -57,13 +53,7 @@ public class LocationService implements ILocationService{
 	}
 	
 	@Override
-	public VertexDto checkInAndOut(LocationDto locationDto, AccountOption accountOption) {
-		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
-		List<List<SafeZone>> totalSafeZoneList = new ArrayList<>();
-		
-		for(TTL ttl : ttlList) 
-			totalSafeZoneList.add(safeZoneService.findByTTLIdOrThrow(ttl.getId()));
-		
+	public VertexDto checkInAndOut(LocationDto locationDto, AccountOption accountOption,List<TTL> ttlList,List<List<SafeZone>> totalSafeZoneList) {		
 		Boolean TF  =vertexCheckUtil.checkInAndOutLocation(SafeZone.builder()
 				.latitude(locationDto.getVertexDto().getLatitude())
 				.longitude(locationDto.getVertexDto().getLongitude()).build(), totalSafeZoneList, ttlList);
@@ -77,6 +67,6 @@ public class LocationService implements ILocationService{
 		AccountOption accountOption = accountOptionRepository.findByFetchLocation(accountOptionId).orElseThrow(() 
         		-> new UsernameNotFoundException("not found accountOption"));
 	
-		return accountOption.getLoctionList();
+		return accountOption.getLocationList();
 	}
 }

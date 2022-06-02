@@ -69,7 +69,7 @@ public class AccountOption {
 	 
 	 //cascade = CascadeType.ALL => 상태변화를 전이
 	 @OneToMany(mappedBy = "accountOption", fetch=FetchType.LAZY , cascade = CascadeType.ALL)
-	 private List<Location> loctionList = new LinkedList<>();
+	 private List<Location> locationList = new LinkedList<>();
 	 
 	 @OneToMany(mappedBy = "accountOption", fetch=FetchType.LAZY , cascade = CascadeType.ALL)
 	 private List<TTL> ttlList = new LinkedList<>();

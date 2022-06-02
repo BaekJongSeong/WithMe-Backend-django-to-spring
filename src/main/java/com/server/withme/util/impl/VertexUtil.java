@@ -24,9 +24,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Component
 public class VertexUtil implements IVertexUtil{
-		
-	private final ISafeZoneService safeZoneService;
-			
+					
 	private final IVertexCheckUtil vertexCheckUtil;
 	
 	@Override
@@ -133,9 +131,8 @@ public class VertexUtil implements IVertexUtil{
 	}
 	
 	@Override
-	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList,AccountOption accountOption){
+	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList,AccountOption accountOption, List<InitSafeZone> initSafeZoneList){
 		List<SafeZone> deleteSafeZoneList = new ArrayList<>();
-		List<InitSafeZone> initSafeZoneList= safeZoneService.findByAccountOptionIdOrThrow(accountOption.getId());
 		List<SafeZone> initSafeZoneListChanged = this.convertInitSafeZoneToSafeZone(initSafeZoneList);
 		
 		for(int idx=0; idx<safeZoneList.size(); idx+=4)

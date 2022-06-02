@@ -5,8 +5,6 @@
     <springProfile name="local"><property resource="logs/logback-local.properties"/></springProfile>
     <springProfile name="dev"><property resource="logs/logback-dev.properties"/></springProfile>
     <springProfile name="product"><property resource="logs/logback-product.properties"/></springProfile>
-    <!-- log packagename -->
-    <property name="LOG_PACKAGE_NAME" value="${log.config.packagename}"/>
     <!-- log file path -->
     <property name="LOG_PATH" value="${log.config.path}"/>
     <!-- log file name -->

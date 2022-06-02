@@ -48,9 +48,7 @@ import lombok.Setter;
 @NoArgsConstructor
 @ApiModel(description = "Account entity: include uuid and timestamp (it is simliar like User)")
 @Table(name = "account")
-public class Account implements UserDetails, Serializable {
-
-	private static final long serialVersionUID = 1L;
+public class Account {
 	
 	@Id
     @GeneratedValue
@@ -85,40 +83,14 @@ public class Account implements UserDetails, Serializable {
     
     private String accountType;
     
-    private Collection<GrantedAuthority> authorities;
-	    
     @OneToOne(mappedBy = "account", fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     private AccountOption accountOption;
     
-    @Override
-	public Collection<? extends GrantedAuthority> getAuthorities() {
-		return authorities;
-	}
 
     public boolean getEmailVerified() {
     	return this.emailVerified;
     }
     
-	@Override
-	public boolean isAccountNonExpired() {
-		return false;
-	}
-
-	@Override
-	public boolean isAccountNonLocked() {
-		return unLocked;
-	}
-
-	@Override
-	public boolean isCredentialsNonExpired() {
-		return false;
-	}
-
-	@Override
-	public boolean isEnabled() {
-		return (emailVerified && unLocked);
-	}
-	
 	 public static Account createAccountEntity(SignupDto signupDto, String password, String role) {
 		return Account.builder()
 			.createAt(new Timestamp(System.currentTimeMillis()))

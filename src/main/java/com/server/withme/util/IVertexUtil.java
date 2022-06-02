@@ -21,5 +21,5 @@ public interface IVertexUtil {
 	
 	public List<VertexDto> createSafeZoneByLocation(AccountOption accountOption,LocationDto locationDto);
 	
-	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList,AccountOption accountOption);
+	public List<SafeZone> calculateDeleteVertex(List<SafeZone> safeZoneList,AccountOption accountOption, List<InitSafeZone> initSafeZoneList);
 }

@@ -5,6 +5,8 @@ import java.util.UUID;
 
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.Location;
+import com.server.withme.entity.SafeZone;
+import com.server.withme.entity.TTL;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.VertexDto;
 /**
@@ -18,7 +20,7 @@ public interface ILocationService {
 	
 	public VertexDto saveLocation(LocationDto locationDto, AccountOption accountOption);
 		
-	public VertexDto checkInAndOut(LocationDto locationDto, AccountOption accountOption);
+	public VertexDto checkInAndOut(LocationDto locationDto, AccountOption accountOption,List<TTL> ttlList,List<List<SafeZone>> totalSafeZoneList);
 	
 	public List<Location> findByAccountOptionIdOrThrow(Integer accountOptionId);
 }
