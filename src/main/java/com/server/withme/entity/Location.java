@@ -1,6 +1,5 @@
 package com.server.withme.entity;
 
-import java.io.Serializable;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -10,6 +9,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -41,18 +41,20 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "Lcoation entity: point for latitude and longitude, insert per 5 second, major thing for processing safe zone (extend and resizing)")
-public class Location implements Serializable, IVertexDto{
-	private static final long serialVersionUID = 1L;
+@Table(name = "location")
+public class Location implements IVertexDto{
 
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Integer id;
 
-    @Column(name = "timestamp")
+    @Column(name = "create_at")
     @Temporal(TemporalType.TIMESTAMP)
     @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
-    private Date timestamp;  
+    private Date createAt;  
+    
+    private String name;
     
     private Double latitude;
     
@@ -72,7 +74,8 @@ public class Location implements Serializable, IVertexDto{
     
 	 public static Location createLocationEntity(LocationDto locationDto, AccountOption accountOption) {
 	    return Location.builder()
-		.timestamp(locationDto.getTtlDto().getTtl())
+		.createAt(locationDto.getTtlDto().getTtl())
+		.name(locationDto.getName())
 		.latitude(locationDto.getVertexDto().getLatitude())
 		.longitude(locationDto.getVertexDto().getLongitude())
 		.accountOption(accountOption)

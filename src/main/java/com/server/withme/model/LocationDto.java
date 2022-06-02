@@ -1,6 +1,6 @@
 package com.server.withme.model;
 
-import com.server.withme.enumclass.IVertexDto;
+import com.server.withme.entity.Location;
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -22,8 +22,18 @@ import lombok.Setter;
 public class LocationDto {
 	
 	@NotNull
+	private String name;
+	
     private TTLDto ttlDto;  
 	
     @NotNull
     private VertexDto vertexDto;
+    
+    public static LocationDto createLocationDto(Location location) {
+		return LocationDto.builder()
+			    .name(location.getName())
+			    .vertexDto(new VertexDto(location.getLatitude(),location.getLongitude()))
+			    .build();
+	}
+    
 }

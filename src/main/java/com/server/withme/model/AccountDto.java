@@ -5,6 +5,7 @@ import java.util.UUID;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.server.withme.entity.Account;
+import com.server.withme.entity.Location;
 import com.sun.istack.NotNull;
 
 import lombok.AllArgsConstructor;
@@ -43,14 +44,17 @@ public class AccountDto {
     
     private boolean unLocked;
     
+    private LocationDto locationDto;
+    
     @NotNull
     private String accountType;
     
-    public static AccountDto createAccountDto(Account account) {
+    public static AccountDto createAccountDto(Account account,Location location) {
 		return AccountDto.builder()
-			    .timestamp(account.getTimestamp())
+			    .timestamp(account.getCreateAt())
 			    .name(account.getName())
 			    .emailVerified(account.getEmailVerified())
+			    .locationDto(LocationDto.createLocationDto(location))
 			    .accountType(account.getAccountType()).build();
 	}
 }

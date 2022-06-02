@@ -33,8 +33,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "MostVisitPlace entity: safe zone box list, the most place where user visited before")
-public class MostVisitPlace implements Serializable {
-	private static final long serialVersionUID = 1L;
+public class MostVisitPlace {
 
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)

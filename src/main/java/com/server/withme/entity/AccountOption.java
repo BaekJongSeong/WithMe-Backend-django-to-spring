@@ -1,6 +1,5 @@
 package com.server.withme.entity;
 
-import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,9 +38,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "AccountOption entity: 1:1 with Account(uuid), option for account")
-public class AccountOption implements Serializable {
-	private static final long serialVersionUID = 1L;
-
+public class AccountOption {
+	
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Integer id;

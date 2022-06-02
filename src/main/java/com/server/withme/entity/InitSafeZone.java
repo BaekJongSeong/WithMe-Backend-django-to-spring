@@ -36,9 +36,8 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "InitSafeZone entity: creating safe_zone, just one box(whole safe zone here)")
-public class InitSafeZone implements Serializable,IVertexDto {
-	private static final long serialVersionUID = 1L;
-
+public class InitSafeZone implements IVertexDto {
+	
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Integer id;

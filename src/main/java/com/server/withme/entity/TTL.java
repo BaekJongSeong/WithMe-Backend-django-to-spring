@@ -46,14 +46,11 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "ttl for safe zone box list, more visit -> longer ttl, less visit -> opposite, for user customizing")
-public class TTL implements Serializable {
-	private static final long serialVersionUID = 1L;
-
+public class TTL {
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
 	 private Integer id;
 	 
-	 @Column(name = "timestamp")
 	 @Temporal(TemporalType.TIMESTAMP)
 	 @DateTimeFormat(pattern = "yyyy-MM-dd HH:mm:ss")
 	 @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
@@ -65,7 +62,6 @@ public class TTL implements Serializable {
 	 
 	 @ManyToOne(fetch = FetchType.LAZY)
 	 private AccountOption accountOption;
-	 
 	 
 	 public static TTL createTTLEntity(Date date, AccountOption accountOption){
 			return TTL.builder()

@@ -21,7 +21,6 @@ import lombok.Setter;
 @NoArgsConstructor
 public class TTLDto {
 	
-	@NotNull
 	private Date ttl;
 	
 	public static TTLDto createTTLDto(Date date) {

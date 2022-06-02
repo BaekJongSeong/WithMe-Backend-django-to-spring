@@ -1,7 +1,5 @@
 package com.server.withme.entity;
 
-import java.io.Serializable;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -36,8 +34,7 @@ import lombok.Setter;
 @AllArgsConstructor
 @NoArgsConstructor
 @ApiModel(description = "SafeZone entity: safe zone box list, divide init safe zone into smaller box list for customizing")
-public class SafeZone implements Serializable, IVertexDto {
-	private static final long serialVersionUID = 1L;
+public class SafeZone implements IVertexDto {
 
 	 @Id
 	 @GeneratedValue(strategy = GenerationType.IDENTITY)
