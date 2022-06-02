@@ -16,11 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.server.withme.entity.AccountOption;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.SafeZoneDto;
 import com.server.withme.model.SafeZoneInfoDto;
 import com.server.withme.model.VertexDto;
+import com.server.withme.serivce.IAccountOptionService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.util.IVertexUtil;
 
@@ -36,6 +38,8 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 public class SafeZoneController {
 
+	private final IAccountOptionService accountOptionService;
+	
 	private final ISafeZoneService safeZoneService;
 	
 	private final IVertexUtil vertexUtil;
@@ -45,7 +49,8 @@ public class SafeZoneController {
             @PathVariable UUID accountId,
             @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
-		VertexDto vertexDto = safeZoneService.saveInitSafeZone(safeZoneDto, accountId);
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+		VertexDto vertexDto = safeZoneService.saveInitSafeZone(safeZoneDto, accountOption);
 		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto.craeteSafeZoneInfoDto(
 					new ArrayList<VertexDto>(Arrays.asList(vertexDto)), vertexDto.getTF(),0);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
@@ -56,7 +61,8 @@ public class SafeZoneController {
             @PathVariable UUID accountId,
             @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
-		List<VertexDto> safeZoneList= safeZoneService.saveSafeZoneFirstTime(vertexUtil.calculateVertex(safeZoneDto.getSafeZone()),accountId);
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+		List<VertexDto> safeZoneList= safeZoneService.saveSafeZoneFirstTime(vertexUtil.calculateVertex(safeZoneDto.getSafeZone()),accountOption);
         return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(safeZoneList).build(),new HttpHeaders(),HttpStatus.OK);
     }
@@ -64,8 +70,9 @@ public class SafeZoneController {
 	@DeleteMapping("/safe-zone/first")
     public ResponseEntity<SafeZoneDto> deleteSafeZoneFirst (
     		@Validated @RequestBody AccountIdDto accountIdDto
-    ) {
-		List<VertexDto> deleteSafeZoneList = safeZoneService.deleteSafeZoneFirstTime(accountIdDto.getAccountId());
+    ) {		
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
+		List<VertexDto> deleteSafeZoneList = safeZoneService.deleteSafeZoneFirstTime(accountOption);
         return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(deleteSafeZoneList).build(),new HttpHeaders(),HttpStatus.OK);
     }
@@ -75,7 +82,8 @@ public class SafeZoneController {
             @PathVariable UUID accountId,
             @Validated @RequestBody LocationDto locationDto
     ) {
-		List<VertexDto> safeZone = safeZoneService.createSafeZoneByLocation(accountId,locationDto);
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+		List<VertexDto> safeZone = safeZoneService.createSafeZoneByLocation(accountOption,locationDto);
 		return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(safeZone).build(),new HttpHeaders(),HttpStatus.OK);
     }

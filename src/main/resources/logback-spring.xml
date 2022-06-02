@@ -1,89 +1,132 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- 60초마다 설정 파일의 변경을 확인 하여 변경시 갱신 -->
-<configuration scan="true" scanPeriod="60 seconds">
-
-    <property resource="logback.properties"/>
-
-    <!--Environment 내의 프로퍼티들을 개별적으로 설정할 수도 있다.-->
-    <springProperty scope="context" name="LOG_LEVEL" source="logging.level.root"/>
+<!-- 30초마다 설정 파일의 변경을 확인한다. 파일이 변경되면 다시 로딩한다 -->
+<configuration scan="true" scanPeriod="30 seconds">
+    <!-- profile 별 설정 가져오기  -->
+    <springProfile name="local"><property resource="logs/logback-local.properties"/></springProfile>
+    <springProfile name="dev"><property resource="logs/logback-dev.properties"/></springProfile>
+    <springProfile name="product"><property resource="logs/logback-product.properties"/></springProfile>
+    <!-- log packagename -->
+    <property name="LOG_PACKAGE_NAME" value="${log.config.packagename}"/>
     <!-- log file path -->
     <property name="LOG_PATH" value="${log.config.path}"/>
     <!-- log file name -->
-    <property name="LOG_FILE_NAME" value="${log.config.filename}"/>
-    <!-- err log file name -->
-    <property name="ERR_LOG_FILE_NAME" value="err_log"/>
+    <property name="LOG_FILE_NAME" value="${log.config.default.filename}"/>
+    <!-- log days -->
+    <property name="LOG_DAYS" value="${log.config.days}"/>
+    <!-- log filesize log -->
+    <property name="LOG_FILESIZE_LOG" value="${log.config.filesizelog}"/>
+    <!-- log filesize zip -->
+    <property name="LOG_FILESIZE_ZIP" value="${log.config.filesizezip}"/>
+    <!-- log filesize total -->
+    <property name="LOG_TOTAL_FILESIZE" value="${log.config.totalfilesize}"/>
+    <!-- log min count -->
+    <property name="LOG_FILE_MIN" value="${log.config.min}"/>
+    <!-- log max count -->
+    <property name="LOG_FILE_MAX" value="${log.config.max}"/>
     <!-- pattern -->
-    <property name="LOG_PATTERN" value="%-5level %d{yy-MM-dd HH:mm:ss}[%thread] [%logger{0}:%line] - %msg%n"/>
+    <property name="LOG_PATTERN_DEFAULT" value="[%d{yyyy-MM-dd HH:mm:ss}] %-5level %logger{36} - %msg%n"/>
+    <property name="LOG_PATTERN_DEFAULT_ERROR" value="[%d{yyyy-MM-dd HH:mm:ss}] %-5level %logger{36} - %msg%n"/>
 
-
-    <!-- Console Appender -->
+    <!-- CONSOLE appender -->
     <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${LOG_PATTERN}</pattern>
+            <pattern>${LOG_PATTERN_DEFAULT}</pattern>
         </encoder>
     </appender>
 
-    <!-- File Appender -->
-    <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <!-- 파일경로 설정 -->
-        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
-        <!-- 출력패턴 설정-->
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${LOG_PATTERN}</pattern>
-        </encoder>
-        <!-- Rolling 정책 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- .gz,.zip 등을 넣으면 자동 일자별 로그파일 압축 -->
-            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}_%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 파일당 최고 용량 kb, mb, gb -->
-                <maxFileSize>10MB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <!-- 일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거-->
-            <maxHistory>90</maxHistory>
-        </rollingPolicy>
-    </appender>
-    <!-- 에러의 경우 파일에 로그 처리 -->
-    <appender name="Error" class="ch.qos.logback.core.rolling.RollingFileAppender">
+    <!-- 테스트를 위한 설정 -->
+    <appender name="ERROR_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
         <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>error</level>
+            <level>ERROR</level>
             <onMatch>ACCEPT</onMatch>
             <onMismatch>DENY</onMismatch>
         </filter>
-        <file>${LOG_PATH}/${ERR_LOG_FILE_NAME}.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <!-- 이 옵션이 없을 경우 한글이 깨지는 경우 있음-->
-            <charset>UTF-8</charset>
-            <pattern>${LOG_PATTERN}</pattern>
+            <pattern>${LOG_PATTERN_DEFAULT_ERROR}</pattern>
         </encoder>
-        <!-- Rolling 정책 -->
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <!-- .gz,.zip 등을 넣으면 자동 일자별 로그파일 압축 -->
-            <fileNamePattern>${LOG_PATH}/${ERR_LOG_FILE_NAME}.%d{yyyy-MM-dd}_%i.log</fileNamePattern>
-            <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
-                <!-- 파일당 최고 용량 kb, mb, gb -->
-                <maxFileSize>100KB</maxFileSize>
-            </timeBasedFileNamingAndTriggeringPolicy>
-            <!-- 일자별 로그파일 최대 보관주기(~일), 해당 설정일 이상된 파일은 자동으로 제거-->
-            <maxHistory>90</maxHistory>
-        </rollingPolicy>
     </appender>
-    <!-- root레벨 설정 -->
-    <root level="info">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="Error"/>
-    </root>
-<!--     특정패키지 로깅레벨 설정-->
-    <logger name="org.apache.ibatis" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="Error"/>
-    </logger>
+    <!-- file appender -->
+    <appender name="INFO_DEFAULT_FILE_APPENDER"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log
+            </fileNamePattern>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN_DEFAULT}</pattern>
+        </encoder>
+    </appender>
 
-    <logger name="org.springframework.web" level="DEBUG" additivity="false">
-        <appender-ref ref="CONSOLE"/>
-        <appender-ref ref="FILE"/>
-        <appender-ref ref="Error"/>
-    </logger>
+    <appender name="ERROR_DEFAULT_FILE_APPENDER" 
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <file>${LOG_PATH}/${LOG_FILE_NAME}-error.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}-error.%d{yyyy-MM-dd}.log
+            </fileNamePattern>
+        </rollingPolicy>
+        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
+            <pattern>${LOG_PATTERN_DEFAULT}</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- 운영 -->
+    <if condition='property("log.config.mode").equals("product")'>
+        <then>
+            <logger name="${LOG_PACKAGE_NAME}" additivity="false">
+                <level value="INFO"/>
+                <appender-ref ref="ERROR_DEFAULT_FILE_APPENDER"/>
+                <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
+            </logger>
+            <logger name="org.springframework" additivity="false">
+                <level value="INFO"/>
+                <appender-ref ref="ERROR_DEFAULT_FILE_APPENDER"/>
+            </logger>
+            <root level="INFO">
+                <appender-ref ref="ERROR_DEFAULT_FILE_APPENDER"/>
+                <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
+            </root>
+        </then>
+        <else>
+            <if condition='property("log.config.mode").equals("dev")'>
+                <!-- 개발 -->
+                <then>
+                    <logger name="${LOG_PACKAGE_NAME}" additivity="false">
+                        <level value="INFO"/>
+                        <appender-ref ref="CONSOLE"/>
+                        <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
+                    </logger>
+                    <logger name="org.springframework" additivity="false">
+                        <level value="INFO"/>
+                        <appender-ref ref="CONSOLE"/>
+                        <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
+                    </logger>
+                    <root level="INFO">
+                        <appender-ref ref="CONSOLE"/>
+                        <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
+                    </root>
+                </then>
+                <!-- 로컬 local -->
+                <else>
+                    <logger name="${LOG_PACKAGE_NAME}" additivity="false">
+                        <level value="DEBUG"/>
+                        <appender-ref ref="CONSOLE"/>
+                    </logger>
+                    <logger name="org.springframework" additivity="false">
+                        <level value="INFO"/>
+                        <appender-ref ref="CONSOLE"/>
+                    </logger>
+                    <root level="DEBUG">
+                        <appender-ref ref="CONSOLE"/>
+                    </root>
+                </else>
+            </if>
+        </else>
+    </if>
+        
 </configuration>

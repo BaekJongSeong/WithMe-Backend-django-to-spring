@@ -9,10 +9,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.server.withme.entity.Account;
 import com.server.withme.entity.AccountOption;
 import com.server.withme.model.AccountOptionDto;
 import com.server.withme.model.SignupDto;
 import com.server.withme.serivce.IAccountOptionService;
+import com.server.withme.serivce.IAccountService;
 
 import lombok.RequiredArgsConstructor;
 /**
@@ -25,13 +27,16 @@ import lombok.RequiredArgsConstructor;
 @RequestMapping("/api")
 public class AccountOptionController {
 
+	private final IAccountService accountService;
+	
 	private final IAccountOptionService accountOptionService;
 	
-	 @PostMapping("/sign-option")
+	 @PostMapping("/account-option")
 	    public ResponseEntity<AccountOptionDto> signupOption (
 	            @Validated @RequestBody SignupDto signupDto
 	    ) {
-		 	AccountOption accountOption = accountOptionService.signUpOption(signupDto);
+			Account account = accountService.findByUsernameOrThrow(signupDto.getLoginDto().getUsername());
+		 	AccountOption accountOption = accountOptionService.signUpOption(account);
 		 	AccountOptionDto accountOptionDto = AccountOptionDto.createAccountOptionDto(accountOption);		 	
 	        return new ResponseEntity<>(accountOptionDto,new HttpHeaders(), HttpStatus.OK);
 	    }

@@ -42,7 +42,7 @@ public class AccountController {
     
     private final TokenProvider tokenProvider;
 
-    @PostMapping("/sign")
+    @PostMapping("/account")
     public ResponseEntity<Account> signup (
             @Validated @RequestBody SignupDto signupDto
     ) {

@@ -2,11 +2,13 @@ package com.server.withme.serivce.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
+
+import javax.transaction.Transactional;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
+import com.server.withme.entity.Account;
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.InitSafeZone;
 import com.server.withme.entity.SafeZone;
@@ -16,10 +18,10 @@ import com.server.withme.model.LocationDto;
 import com.server.withme.model.SafeZoneDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.repository.AccountOptionRepository;
+import com.server.withme.repository.AccountRepository;
 import com.server.withme.repository.InitSafeZoneRepository;
 import com.server.withme.repository.SafeZoneRepository;
 import com.server.withme.repository.TTLRepository;
-import com.server.withme.serivce.IAccountOptionService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.serivce.ITTLService;
 import com.server.withme.util.IVertexCheckUtil;
@@ -36,6 +38,8 @@ import lombok.RequiredArgsConstructor;
 @Service
 public class SafeZoneService implements ISafeZoneService{
 	
+	private final AccountRepository accountRepository;
+	
 	private final SafeZoneRepository safeZoneRepository;
 	
 	private final InitSafeZoneRepository initSafeZoneRepository;
@@ -43,11 +47,7 @@ public class SafeZoneService implements ISafeZoneService{
 	private final AccountOptionRepository accountOptionRepository;
 	
 	private final TTLRepository ttlRepository;
-		
-	private final ISafeZoneService safeZoneService;
-	
-	private final IAccountOptionService accountOptionService;
-		
+					
 	private final ITTLService ttlService;
 	
 	private final IVertexUtil vertexUtil;
@@ -55,26 +55,21 @@ public class SafeZoneService implements ISafeZoneService{
 	private final IVertexCheckUtil vertexCheckUtil;
 	
 	@Override
-	public VertexDto saveInitSafeZone(SafeZoneDto safeZoneDto, UUID accountId) {
+	public VertexDto saveInitSafeZone(SafeZoneDto safeZoneDto, AccountOption accountOption) {
 		
 		List<VertexDto> initSafeZoneList = safeZoneDto.getSafeZone();
 		VertexDto vertexDto = vertexCheckUtil.checkSafeZoneMinSize(initSafeZoneList).get(0);
 		if(vertexDto.getTF()) {
-			AccountOption accountOption = accountOptionService.updateAccountOption(
-					accountId,vertexDto.getLatitude(),vertexDto.getLongitude());
-			
+			accountOption = accountOptionRepository.update(accountOption.getId(), vertexDto.getLatitude(),vertexDto.getLongitude());
 			for(VertexDto vertex: initSafeZoneList) 
 				initSafeZoneRepository.save(InitSafeZone.createInitSafeZoneEntity(vertex,accountOption));
 		}
-		return new VertexDto(1.0,1.0, vertexDto.getTF());
+		return new VertexDto(vertexDto.getLatitude(),vertexDto.getLongitude(), vertexDto.getTF());
 	}
 	
 	@Override
-	public List<VertexDto> saveSafeZoneFirstTime(List<VertexDto> safeZone, UUID accountId) {
-		
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+	public List<VertexDto> saveSafeZoneFirstTime(List<VertexDto> safeZone, AccountOption accountOption) {
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
-		
 		int count=0;
 		for(TTL ttl: ttlList) {
 			while(true) {
@@ -89,13 +84,13 @@ public class SafeZoneService implements ISafeZoneService{
 	}
 	
 	@Override
-	public List<VertexDto> deleteSafeZoneFirstTime(UUID accountId) {
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+	@Transactional
+	public List<VertexDto> deleteSafeZoneFirstTime(AccountOption accountOption) {
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
 		
 		List<SafeZone> safeZoneList = new ArrayList<>();
 		for(TTL ttl: ttlList) 
-			safeZoneList.addAll(safeZoneService.findByTTLIdOrThrow(ttl.getId()));
+			safeZoneList.addAll(this.findByTTLIdOrThrow(ttl.getId()));
 		
 		List<SafeZone> deleteSafeZoneList = vertexUtil.calculateDeleteVertex(safeZoneList,accountOption);
 		List<Integer> ttlIndexList = new ArrayList<>();
@@ -108,8 +103,7 @@ public class SafeZoneService implements ISafeZoneService{
 	}
 	
 	@Override
-	public List<VertexDto> createSafeZoneByLocation(UUID accountId,LocationDto locationDto){
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+	public List<VertexDto> createSafeZoneByLocation(AccountOption accountOption,LocationDto locationDto){
 		TTL ttl = ttlService.saveTTL(accountOption);
 		List<VertexDto> newSafeZoneList = vertexUtil.createSafeZoneByLocation(accountOption,locationDto);
 		
@@ -120,9 +114,11 @@ public class SafeZoneService implements ISafeZoneService{
 	}
 	
 	@Override
+	@Transactional
 	public List<InitSafeZone> loadInitSafeZoneList(AccountIdDto accountIdDto){
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
-		return this.findByAccountOptionIdOrThrow(accountOption.getId());
+		Account account = accountRepository.findByFetchAccountOption(accountIdDto.getAccountId()).orElseThrow(() 
+        		-> new UsernameNotFoundException("not found user"));
+		return this.findByAccountOptionIdOrThrow(account.getAccountOption().getId());
 	}
 
 	@Override

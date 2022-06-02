@@ -64,7 +64,6 @@ public class AccountService implements IAccountService {
 	@Override
 	public AccountIdDto getAccountId(LoginDto loginDto) {
 		Account account = this.findByUsernameOrThrow(loginDto.getUsername());
-		
 		return AccountIdDto.builder().accountId(account.getAccountId()).build();
 	}
 	
@@ -79,7 +78,7 @@ public class AccountService implements IAccountService {
 		Calendar calStandard = DayCalculator.ZERO.calculateDay(new Timestamp(System.currentTimeMillis()));
 		
 		for(Account account : accountList) { 
-			Calendar cal = DayCalculator.SEVEN.calculateDay(account.getTimestamp());
+			Calendar cal = DayCalculator.SEVEN.calculateDay(account.getCreateAt());
 			if(cal.getTime().getTime() < calStandard.getTime().getTime())
 				checkedAccountList.add(account);
 		}
@@ -90,7 +89,6 @@ public class AccountService implements IAccountService {
 	public Account findByAccountIdOrThrow(UUID accountId){
 	    Account account = accountRepository.findByAccountId(accountId).orElseThrow(() 
 	        		-> new UsernameNotFoundException("not found user"));
-	    	
 	    return account;
 	}
 	    
@@ -98,7 +96,6 @@ public class AccountService implements IAccountService {
 	public Account findByUsernameOrThrow(String username){
 		Account account = accountRepository.findByUsername(username).orElseThrow(() 
 	        		-> new UsernameNotFoundException("not found username : " + username));
-	    	
 	    return account;
 	}
 }

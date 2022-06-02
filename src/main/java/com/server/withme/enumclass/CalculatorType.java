@@ -1,7 +1,5 @@
 package com.server.withme.enumclass;
 
-import java.util.function.Function;
-
 //아래는 람다버전, 위는 추상 메소드 버전, enum 필드에 추상 메소드 설정하고 각 enum요소들에서 구현....크
 
 public enum CalculatorType {

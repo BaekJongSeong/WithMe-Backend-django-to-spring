@@ -23,14 +23,13 @@ import lombok.Setter;
 @NoArgsConstructor
 public class AccountOptionDto {
 	
-	 @NotNull
+	 
 	 private Integer id;
 	 
 	 private Integer boxSize;
 	 
 	 private Double distance;
 	 
-	 @NotNull
 	 private Boolean initSafeZone;
 	 
 	 private Boolean safeMove;
@@ -41,7 +40,6 @@ public class AccountOptionDto {
 	 @NotNull
 	 private Double yPoint;
 	 
-	 @NotNull
 	 private UUID accountId;
 	 
 	public static AccountOptionDto createAccountOptionDto(AccountOption accountOption) {

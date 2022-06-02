@@ -14,7 +14,7 @@ import com.server.withme.model.SignupDto;
  */
 public interface IAccountOptionService {
 
-	public AccountOption signUpOption(SignupDto signupDto);
+	public AccountOption signUpOption(Account account);
 	
 	public AccountOption updateAccountOption(UUID accountId, Double latitude, Double longitude);
 	

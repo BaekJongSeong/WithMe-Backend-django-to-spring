@@ -3,6 +3,7 @@ package com.server.withme.serivce;
 import java.util.List;
 
 import com.server.withme.entity.Account;
+import com.server.withme.entity.AccountOption;
 /**
  * Interface for SchedularService
  *
@@ -10,7 +11,7 @@ import com.server.withme.entity.Account;
  */
 public interface ISchedularService {
 	
-	public void updateSafeZoneBySchedular(List<Account> checkedAccountList);
+	public void updateSafeZoneBySchedular(List<AccountOption> accountOptionList);
 	
-	public void deleteExpireTTLBySchedular(List<Account> checkedAccountList);
+	public void deleteExpireTTLBySchedular(List<AccountOption> accountOptionList);
 }

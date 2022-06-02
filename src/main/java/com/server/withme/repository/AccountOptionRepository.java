@@ -20,4 +20,7 @@ public interface AccountOptionRepository extends JpaRepository<AccountOption, In
 	
 	@Query("select c from AccountOption c left join fetch c.mostVisitPlaceList where c.id=?1")
     Optional<AccountOption> findByFetchMostVisitPlace(Integer id);
+	
+	@Query("update AccountOption c set c.initSafeZone=true, c.xPoint=?2, c.yPoint=?3 where c.id=?1")
+	AccountOption update(Integer id, Double latitude, Double longitude);
 }

@@ -5,13 +5,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.transaction.Transactional;
+
 import org.springframework.stereotype.Service;
 
-import com.server.withme.entity.Account;
 import com.server.withme.entity.AccountOption;
 import com.server.withme.entity.TTL;
 import com.server.withme.model.VertexDto;
-import com.server.withme.serivce.IAccountOptionService;
+import com.server.withme.repository.AccountOptionRepository;
 import com.server.withme.serivce.ILocationService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.serivce.ISchedularService;
@@ -30,8 +31,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class SchedularService implements ISchedularService{
-	
-	private final IAccountOptionService accountOptionService;
+		
+	private final AccountOptionRepository accountOptionRepository;
 	
 	private final ILocationService locationService;
 	
@@ -45,9 +46,8 @@ public class SchedularService implements ISchedularService{
 	
 	
 	@Override
-	public void updateSafeZoneBySchedular(List<Account> checkedAccountList) {
-		List<AccountOption> accountOptionList = accountOptionService.findAllFetchAccountOption(checkedAccountList);
-		
+	@Transactional
+	public void updateSafeZoneBySchedular(List<AccountOption> accountOptionList) {		
 		for(AccountOption accountOption: accountOptionList) {
 			List<VertexDto> locationList = vertexUtil.convertToVertexDto(
 					locationService.findByAccountOptionIdOrThrow(accountOption.getId()));
@@ -55,7 +55,7 @@ public class SchedularService implements ISchedularService{
 			List<VertexDto> vertexDto = vertexCheckUtil.checkSafeZoneMinSize(locationList);
 			
 			if(vertexDto.get(0).getTF()) {
-				accountOption = accountOptionService.updateAccountOption(accountOption.getAccount().getAccountId(),
+				accountOption = accountOptionRepository.update(accountOption.getId(), 
 						vertexDto.get(0).getLatitude(),vertexDto.get(0).getLongitude());
 				
 				List<VertexDto> vertexDtoList= vertexUtil.calculateVertex(locationList);
@@ -67,7 +67,7 @@ public class SchedularService implements ISchedularService{
 				ttlService.deleteAllTTLById(ttlIdList);	
 				
 				ttlService.saveTTLFirstTime(vertexDtoList,accountOption);
-				safeZoneService.saveSafeZoneFirstTime(vertexDtoList, accountOption.getAccount().getAccountId());
+				safeZoneService.saveSafeZoneFirstTime(vertexDtoList, accountOption);
 				List<List<VertexDto>> finalSafeZoneList = vertexCheckUtil.
 						checkInAndOutForUpdate(accountOption,locationList, vertexDtoList, vertexDto);
 				
@@ -77,8 +77,8 @@ public class SchedularService implements ISchedularService{
 	}
 	
 	@Override
-	public void deleteExpireTTLBySchedular(List<Account> checkedAccountList) {
-		List<AccountOption> accountOptionList = accountOptionService.findAllFetchAccountOption(checkedAccountList);
+	@Transactional
+	public void deleteExpireTTLBySchedular(List<AccountOption> accountOptionList) {
 		for(AccountOption accountOption: accountOptionList) {
 			List<TTL> ttlList = ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
 			
@@ -105,7 +105,7 @@ public class SchedularService implements ISchedularService{
 				}
 			}
 			ttlService.deleteAllTTLById(ttlIdList);
-			accountOptionService.updateAccountOption(accountOption.getAccount().getAccountId(),x,y);
+			accountOptionRepository.update(accountOption.getId(), x,y);
 		}
 	}
 }

@@ -28,7 +28,7 @@ public class AccountDto {
     private UUID accountId;
 
     @NotNull
-    private Date timestamp;  
+    private Date createAt;  
 
     @NotNull
     private String username;
@@ -43,18 +43,14 @@ public class AccountDto {
     private boolean emailVerified;
     
     private boolean unLocked;
-    
-    private LocationDto locationDto;
-    
-    @NotNull
+        
     private String accountType;
     
-    public static AccountDto createAccountDto(Account account,Location location) {
+    public static AccountDto createAccountDto(Account account) {
 		return AccountDto.builder()
-			    .timestamp(account.getCreateAt())
+			    .createAt(account.getCreateAt())
 			    .name(account.getName())
 			    .emailVerified(account.getEmailVerified())
-			    .locationDto(LocationDto.createLocationDto(location))
 			    .accountType(account.getAccountType()).build();
 	}
 }

@@ -26,8 +26,6 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @Service
 public class AccountOptionService implements IAccountOptionService{
-
-	private final IAccountService accountService;
 	
 	private final AccountRepository accountRepository;
 	
@@ -35,8 +33,7 @@ public class AccountOptionService implements IAccountOptionService{
 	
 	//양방향이니까 양쪽 다 들고 있어야함
 	@Override
-	public AccountOption signUpOption(SignupDto signupDto) {
-		Account account = accountService.findByUsernameOrThrow(signupDto.getLoginDto().getUsername());
+	public AccountOption signUpOption(Account account) {
 		AccountOption accountOption = AccountOption.createAccountOptionEntity(account);
 		return accountOptionRepository.save(accountOption);
 	}

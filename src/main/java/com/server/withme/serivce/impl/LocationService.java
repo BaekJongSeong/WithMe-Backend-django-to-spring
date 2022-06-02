@@ -37,34 +37,27 @@ public class LocationService implements ILocationService{
 	private final ITTLService ttlService;
 	
 	private final ISafeZoneService safeZoneService;
-	
-	private final IAccountOptionService accountOptionService;
-	
+		
 	private final AccountOptionRepository accountOptionRepository;
 
 	private final IVertexCheckUtil vertexCheckUtil;
 	
 	@Override
-	public boolean checkLatestLocation(LocationDto locationDto , UUID accountId) {
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+	public boolean checkLatestLocation(LocationDto locationDto , AccountOption accountOption) {
 		Location location = locationRepository.findByFetchLatest(accountOption.getId());
 		return vertexCheckUtil.checkLatestLocation(locationDto,location);
 	}
 	
 	@Override
-	public VertexDto saveLocation(LocationDto locationDto, UUID accountId) {
-		
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+	public VertexDto saveLocation(LocationDto locationDto, AccountOption accountOption) {
 		Location location = Location.createLocationEntity(locationDto, accountOption);
-	
 		locationRepository.save(location);
 		return new VertexDto(locationDto.getVertexDto().getLatitude(),
-				locationDto.getVertexDto().getLongitude(),this.checkLatestLocation(locationDto,accountId));
+				locationDto.getVertexDto().getLongitude(),this.checkLatestLocation(locationDto,accountOption));
 	}
 	
 	@Override
-	public VertexDto checkInAndOut(LocationDto locationDto, UUID accountId) {
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+	public VertexDto checkInAndOut(LocationDto locationDto, AccountOption accountOption) {
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
 		List<List<SafeZone>> totalSafeZoneList = new ArrayList<>();
 		
