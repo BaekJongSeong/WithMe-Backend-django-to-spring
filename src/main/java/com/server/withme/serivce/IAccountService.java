@@ -32,4 +32,6 @@ public interface IAccountService extends UserDetailsService {
     public Account findByAccountIdOrThrow(UUID accountId);
     
     public Account findByUsernameOrThrow(String username);
+    
+    public Account findByEmail(String email);
 }

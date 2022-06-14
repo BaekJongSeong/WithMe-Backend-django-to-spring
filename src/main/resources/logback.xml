@@ -1,0 +1,3 @@
+<configuration debug="true" scanPeriod="30 seconds">
+    <include resource="logback-spring.xml"/>
+</configuration>

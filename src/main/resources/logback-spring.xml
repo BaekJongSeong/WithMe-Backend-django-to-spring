@@ -1,130 +1,78 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!-- 30초마다 설정 파일의 변경을 확인한다. 파일이 변경되면 다시 로딩한다 -->
-<configuration scan="true" scanPeriod="30 seconds">
-    <!-- profile 별 설정 가져오기  -->
-    <springProfile name="local"><property resource="logs/logback-local.properties"/></springProfile>
-    <springProfile name="dev"><property resource="logs/logback-dev.properties"/></springProfile>
-    <springProfile name="product"><property resource="logs/logback-product.properties"/></springProfile>
-    <!-- log file path -->
-    <property name="LOG_PATH" value="${log.config.path}"/>
-    <!-- log file name -->
-    <property name="LOG_FILE_NAME" value="${log.config.default.filename}"/>
-    <!-- log days -->
-    <property name="LOG_DAYS" value="${log.config.days}"/>
-    <!-- log filesize log -->
-    <property name="LOG_FILESIZE_LOG" value="${log.config.filesizelog}"/>
-    <!-- log filesize zip -->
-    <property name="LOG_FILESIZE_ZIP" value="${log.config.filesizezip}"/>
-    <!-- log filesize total -->
-    <property name="LOG_TOTAL_FILESIZE" value="${log.config.totalfilesize}"/>
-    <!-- log min count -->
-    <property name="LOG_FILE_MIN" value="${log.config.min}"/>
-    <!-- log max count -->
-    <property name="LOG_FILE_MAX" value="${log.config.max}"/>
-    <!-- pattern -->
-    <property name="LOG_PATTERN_DEFAULT" value="[%d{yyyy-MM-dd HH:mm:ss}] %-5level %logger{36} - %msg%n"/>
-    <property name="LOG_PATTERN_DEFAULT_ERROR" value="[%d{yyyy-MM-dd HH:mm:ss}] %-5level %logger{36} - %msg%n"/>
+<!-- <?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds"> -->
+<included>
+<!--  <include resource="org/springframework/boot/logging/logback/defaults.xml" /> -->
 
-    <!-- CONSOLE appender -->
-    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${LOG_PATTERN_DEFAULT}</pattern>
-        </encoder>
-    </appender>
+  	<property name = "moduleId" value ="withme_app"/>
+	<property name = "type" value = "run"/>
+	<property name = "logback" value = "researcher1"/>
+<!--  <property name = "logdir" value = "/var/lib/tomcat9/webapps"/>-->
+	
+	<appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+   		<layout class="ch.qos.logback.classic.PatternLayout">
+     		<Pattern>[%d{yyyy-MM-dd HH:mm:ss}:%-3relative][%thread] %-5level %logger{36} - %msg%n</Pattern>
+   		</layout>
+	</appender>
+	
+	
+	
+<appender name="SIFT-TRACE" class="ch.qos.logback.classic.sift.SiftingAppender">
+    <discriminator  class="ch.qos.logback.classic.sift.MDCBasedDiscriminator">
+        <Key>loggerFileName</Key>
+        <DefaultValue>unknown</DefaultValue>
+    </discriminator>
+    <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+        <evaluator class="ch.qos.logback.classic.boolex.JaninoEventEvaluator">
+            <expression>
+                mdc.get("loggerFileName")!=null
+            </expression>
+        </evaluator>
+        <OnMismatch>DENY</OnMismatch>
+        <OnMatch>NEUTRAL</OnMatch>
+    </filter>
+    <sift>
+        <appender name="FILE-${loggerFileName}" class="ch.qos.logback.core.FileAppender">
+            <File>./withme_app/${loggerFileName}.log</File>
+            <Append>true</Append>
+            <layout class="ch.qos.logback.classic.PatternLayout">
+		  		<pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%-5level]  %C %M %L %logger %msg%n</pattern>
+            </layout>
+        </appender>
+    </sift>
+</appender>
 
-    <!-- 테스트를 위한 설정 -->
-    <appender name="ERROR_CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${LOG_PATTERN_DEFAULT_ERROR}</pattern>
-        </encoder>
-    </appender>
-    <!-- file appender -->
-    <appender name="INFO_DEFAULT_FILE_APPENDER"
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/${LOG_FILE_NAME}.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}.%d{yyyy-MM-dd}.log
-            </fileNamePattern>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${LOG_PATTERN_DEFAULT}</pattern>
-        </encoder>
-    </appender>
 
-    <appender name="ERROR_DEFAULT_FILE_APPENDER" 
-              class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <filter class="ch.qos.logback.classic.filter.LevelFilter">
-            <level>ERROR</level>
-            <onMatch>ACCEPT</onMatch>
-            <onMismatch>DENY</onMismatch>
-        </filter>
-        <file>${LOG_PATH}/${LOG_FILE_NAME}-error.log</file>
-        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-            <fileNamePattern>${LOG_PATH}/${LOG_FILE_NAME}-error.%d{yyyy-MM-dd}.log
-            </fileNamePattern>
-        </rollingPolicy>
-        <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
-            <pattern>${LOG_PATTERN_DEFAULT}</pattern>
-        </encoder>
-    </appender>
-    
-    <!-- 운영 -->
-    <if condition='property("log.config.mode").equals("product")'>
-        <then>
-            <logger name="${LOG_PACKAGE_NAME}" additivity="false">
-                <level value="INFO"/>
-                <appender-ref ref="ERROR_DEFAULT_FILE_APPENDER"/>
-                <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
-            </logger>
-            <logger name="org.springframework" additivity="false">
-                <level value="INFO"/>
-                <appender-ref ref="ERROR_DEFAULT_FILE_APPENDER"/>
-            </logger>
-            <root level="INFO">
-                <appender-ref ref="ERROR_DEFAULT_FILE_APPENDER"/>
-                <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
-            </root>
-        </then>
-        <else>
-            <if condition='property("log.config.mode").equals("dev")'>
-                <!-- 개발 -->
-                <then>
-                    <logger name="${LOG_PACKAGE_NAME}" additivity="false">
-                        <level value="INFO"/>
-                        <appender-ref ref="CONSOLE"/>
-                        <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
-                    </logger>
-                    <logger name="org.springframework" additivity="false">
-                        <level value="INFO"/>
-                        <appender-ref ref="CONSOLE"/>
-                        <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
-                    </logger>
-                    <root level="INFO">
-                        <appender-ref ref="CONSOLE"/>
-                        <appender-ref ref="INFO_DEFAULT_FILE_APPENDER"/>
-                    </root>
-                </then>
-                <!-- 로컬 local -->
-                <else>
-                    <logger name="${LOG_PACKAGE_NAME}" additivity="false">
-                        <level value="DEBUG"/>
-                        <appender-ref ref="CONSOLE"/>
-                    </logger>
-                    <logger name="org.springframework" additivity="false">
-                        <level value="INFO"/>
-                        <appender-ref ref="CONSOLE"/>
-                    </logger>
-                    <root level="DEBUG">
-                        <appender-ref ref="CONSOLE"/>
-                    </root>
-                </else>
-            </if>
-        </else>
-    </if>
-        
-</configuration>
+
+
+	
+	<!--  
+	<appender name = "FILE" class = "ch.qos.logback.core.rolling.RollingFileAppender">
+
+		<file>${moduleId}/${logback}/${name}.log</file>
+		<append>true</append>
+		<rollingPolicy class = "ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+		  <fileNamePattern>${moduleId}/${logback}/%d{yyyy-MM-dd}.log</fileNamePattern>
+		  <maxHistory>180</maxHistory>
+		</rollingPolicy>
+		<encoder>
+		  <pattern>[%d{yyyy-MM-dd HH:mm:ss}] [%-5level]  %C %M %L %logger %msg%n</pattern>
+		</encoder>
+	</appender> -->
+
+	<logger name="org.springframework" level="INFO" />
+
+	<root level="INFO">
+    	<appender-ref ref="STDOUT"/>
+    	<appender-ref ref = "SIFT-TRACE"/>
+ 	</root>
+ 	
+ <!-- 	 <logger name="AuthController" additivity="false">
+   		<level value = "INFO" /> 
+   			<appender-ref ref="SIFT-TRACE" />
+ 	</logger>-->	
+ 	
+ 	<logger name="org.hibernate.SQL" additivity="false">
+   		<level value = "INFO" />
+   			<appender-ref ref="SIFT-TRACE" />
+ 	</logger>
+</included>

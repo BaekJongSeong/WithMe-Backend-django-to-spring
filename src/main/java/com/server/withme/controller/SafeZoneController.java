@@ -1,10 +1,15 @@
 package com.server.withme.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -44,16 +49,25 @@ public class SafeZoneController {
 	
 	private final IVertexUtil vertexUtil;
 	
+    private final Logger logger = LoggerFactory.getLogger(SafeZoneController.class);
+
 	@PostMapping("/safe-zone/init/{accountId}")
-    public ResponseEntity<SafeZoneInfoDto<VertexDto>> saveInitSafeZone (
+    public String saveInitSafeZone (
             @PathVariable UUID accountId,
             @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		VertexDto vertexDto = safeZoneService.saveInitSafeZone(safeZoneDto, accountOption);
+			MDC.put("loggerFileName", accountOption.getAccount().getAccountId()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			logger.info(accountOption.getAccount().getUsername() +" are waiting for mail send session.");
+			logger.info(accountOption.getAccount().getAccountId() +"is saving init-safe-zone successed.");
+			MDC.remove("loggerFileName");
+		
+		httpServletResponse.sendRedirect("https://naver.com");
+			
 		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto.craeteSafeZoneInfoDto(
 					new ArrayList<VertexDto>(Arrays.asList(vertexDto)), vertexDto.getTF(),0);
-		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
+		return "http://121.154.58.201:8040/admin/?username=withmeuser&password=adminuser";
     }
 	
 	@PostMapping("/safe-zone/{accountId}")
@@ -63,7 +77,11 @@ public class SafeZoneController {
     ) {
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		List<VertexDto> safeZoneList= safeZoneService.saveSafeZoneFirstTime(vertexUtil.calculateVertex(safeZoneDto.getSafeZone()),accountOption);
-        return new ResponseEntity<>(SafeZoneDto.builder()
+			MDC.put("loggerFileName", accountId.toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			logger.info(accountOption.getAccount().getUsername() +"is removing safe zone boxes");
+			logger.info(safeZoneList.size() + " are created.\n" + safeZoneList.toString());
+			MDC.remove("loggerFileName");
+		return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(safeZoneList).build(),new HttpHeaders(),HttpStatus.OK);
     }
 	
@@ -73,6 +91,10 @@ public class SafeZoneController {
     ) {		
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
 		List<VertexDto> deleteSafeZoneList = safeZoneService.deleteSafeZoneFirstTime(accountOption);
+			MDC.put("loggerFileName", accountIdDto.getAccountId().toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			logger.info(accountOption.getAccount().getUsername() +"is removing safe zone boxes");
+			logger.info(deleteSafeZoneList.size() + " are removed.");
+			MDC.remove("loggerFileName");
         return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(deleteSafeZoneList).build(),new HttpHeaders(),HttpStatus.OK);
     }
@@ -84,6 +106,10 @@ public class SafeZoneController {
     ) {
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		List<VertexDto> safeZone = safeZoneService.createSafeZoneByLocation(accountOption,locationDto);
+			MDC.put("loggerFileName", accountId.toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			logger.info(accountOption.getAccount().getUsername() +"is creating addtional safe zone boxes");
+			logger.info(safeZone.toString());
+			MDC.remove("loggerFileName");
 		return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(safeZone).build(),new HttpHeaders(),HttpStatus.OK);
     }

@@ -1,10 +1,15 @@
 package com.server.withme.controller;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -47,6 +52,8 @@ public class LocationController {
 	
 	private final IAccountOptionService accountOptionService;
 		
+    private final Logger logger = LoggerFactory.getLogger(LocationController.class);
+
 	@PostMapping("/location/{accountId}")
     public ResponseEntity<SafeZoneInfoDto<VertexDto>> saveLocation (
     		@PathVariable UUID accountId,
@@ -54,10 +61,15 @@ public class LocationController {
     ) {
 		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
 		VertexDto location = locationService.saveLocation(locationDto,accountOption);
+			MDC.put("loggerFileName", accountId.toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			logger.info(accountOption.getAccount().getUsername() +"is creating location session start.");
+			logger.info(accountId.toString()+","+location.getLatitude()+","+location.getLongitude()+"is saved location success.");
+			MDC.remove("loggerFileName");
 		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto
 				.craeteSafeZoneInfoDto(new ArrayList<VertexDto>(Arrays.asList(location)),location.getTF(),0);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);
 	}
+	
 	
 	@PostMapping("/location/in-out/{accountId}")
     public ResponseEntity<SafeZoneInfoDto<VertexDto>> checkLocationInAndOut (
@@ -70,6 +82,11 @@ public class LocationController {
 		for(TTL ttl : ttlList) 
 			totalSafeZoneList.add(safeZoneService.findByTTLIdOrThrow(ttl.getId()));
 		VertexDto location = locationService.checkInAndOut(locationDto,accountOption,ttlList,totalSafeZoneList);
+			MDC.put("loggerFileName", accountId.toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			logger.info(accountOption.getAccount().getUsername() +"is checking in/out location session start.");
+			logger.info(accountId.toString()+"is checked location success.");
+			logger.info((location.getTF()==true ? "person, out of safe zone." : "person, already inside of safe zone."));
+			MDC.remove("loggerFileName");
 		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto
 				.craeteSafeZoneInfoDto(new ArrayList<VertexDto>(Arrays.asList(location)),location.getTF(),1);
 		return new ResponseEntity<>(safeZoneInfoDto,new HttpHeaders(),HttpStatus.OK);

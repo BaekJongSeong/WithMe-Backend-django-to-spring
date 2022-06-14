@@ -73,6 +73,11 @@ public class AccountService implements IAccountService {
 	}
 	
 	@Override
+    public Account findByEmail(String email) {
+		return accountRepository.findByEmail(email);
+	}
+	
+	@Override
     public List<Account> checkSevenDayOver(List<Account> accountList){
 		List<Account> checkedAccountList = new ArrayList<>();
 		Calendar calStandard = DayCalculator.ZERO.calculateDay(new Timestamp(System.currentTimeMillis()));

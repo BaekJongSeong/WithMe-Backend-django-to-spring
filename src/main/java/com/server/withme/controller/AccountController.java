@@ -1,5 +1,11 @@
 package com.server.withme.controller;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -42,19 +48,29 @@ public class AccountController {
     
     private final TokenProvider tokenProvider;
 
+    private final Logger logger = LoggerFactory.getLogger(AccountController.class);
+    
     @PostMapping("/account")
-    public ResponseEntity<Account> signup (
+    public ResponseEntity<AccountDto> signup (
             @Validated @RequestBody SignupDto signupDto
     ) {
-        return ResponseEntity.ok(accountService.checkForSignup(signupDto));
+    	AccountDto accountDto =AccountDto.createAccountDto(accountService.checkForSignup(signupDto));
+    		MDC.put("loggerFileName", accountDto.getAccountId().toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+    		logger.info(signupDto.getLoginDto().getUsername() +"is creating account session start.");
+    		logger.info(accountDto.getAccountId().toString() +"is created success");
+    		MDC.remove("loggerFileName");
+    	return new ResponseEntity<>(accountDto,new HttpHeaders(),HttpStatus.OK);
     }
 
     @PutMapping("/account")
     public ResponseEntity<AccountDto> modifyAccount (
             @Validated @RequestBody AccountIdDto accountIdDto
     ) {
-    	Account account = accountService.modifyAccount(accountIdDto);
-    	AccountDto accountDto =AccountDto.createAccountDto(account);
+    	AccountDto accountDto =AccountDto.createAccountDto(accountService.modifyAccount(accountIdDto));
+    		MDC.put("loggerFileName", accountDto.getAccountId().toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+    		logger.info(accountDto.getUsername() +"is modifying account session start.");
+    		logger.info(accountDto.getAccountId().toString() +"is modified success.");
+    		MDC.remove("loggerFileName");
         return new ResponseEntity<>(accountDto,new HttpHeaders(),HttpStatus.OK);
     }
     
@@ -76,6 +92,10 @@ public class AccountController {
         httpHeaders.add(JwtFilter.AUTHORIZATION_HEADER, "Bearer " + jwt);
 
         AccountIdDto accountIdDto = accountService.getAccountId(loginDto);
+	        MDC.put("loggerFileName", accountIdDto.getAccountId().toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
+			logger.info(loginDto.getUsername() +"is login session start.");
+			logger.info(accountIdDto.getAccountId().toString() +"is logined success.");
+			MDC.remove("loggerFileName");
         
         return new ResponseEntity<TokenDto>(TokenDto.builder().accountId(accountIdDto.getAccountId())
         									.token(jwt).build(), httpHeaders, HttpStatus.OK);
