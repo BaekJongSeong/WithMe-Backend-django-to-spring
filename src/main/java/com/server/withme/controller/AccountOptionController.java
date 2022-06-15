@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.server.withme.entity.Account;
-import com.server.withme.entity.AccountOption;
 import com.server.withme.model.AccountOptionDto;
 import com.server.withme.model.SignupDto;
 import com.server.withme.serivce.IAccountOptionService;
@@ -44,8 +43,7 @@ public class AccountOptionController {
 	            @Validated @RequestBody SignupDto signupDto
 	    ) {
 			Account account = accountService.findByUsernameOrThrow(signupDto.getLoginDto().getUsername());
-		 	AccountOption accountOption = accountOptionService.signUpOption(account);
-		 	AccountOptionDto accountOptionDto = AccountOptionDto.createAccountOptionDto(accountOption);
+		 	AccountOptionDto accountOptionDto = AccountOptionDto.createAccountOptionDto(accountOptionService.signUpOption(account));
 			 	MDC.put("loggerFileName", account.getAccountId().toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 				logger.info(account.getUsername() +"is creating option session start.");
 				logger.info(account.getAccountId().toString() +"is created option success.");

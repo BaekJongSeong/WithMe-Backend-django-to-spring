@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>email service</title>
+    <style type="text/css">
+        /* GENERAL STYLE RESETS */
+        body, #bodyTable {
+            height: 100% !important;
+            padding: 0;
+        }
+
+        table, td {
+            border-collapse: collapse;
+        }
+    </style>
+    <style type="text/css">
+        /* CLIENT-SPECIFIC RESETS */
+        /* Outlook.com(Hotmail)의 전체 너비 및 적절한 줄 높이를 허용 */
+        .ReadMsgBody {
+            width: 100%;
+        }
+
+        .ExternalClass {
+            width: 100%;
+        }
+
+        .ExternalClass, .ExternalClass p, .ExternalClass span, .ExternalClass font, .ExternalClass td, .ExternalClass div {
+            line-height: 100%;
+        }
+
+        /* Outlook 2007 이상에서 Outlook이 추가하는 테이블 주위의 간격을 제거 */
+        table, td {
+            mso-table-lspace: 0pt;
+            mso-table-rspace: 0pt;
+        }
+
+        /* Internet Explorer에서 크기가 조정된 이미지를 렌더링하는 방식을 수정 */
+        img {
+            -ms-interpolation-mode: bicubic;
+        }
+
+        /* Webkit 및 Windows 기반 클라이언트가 텍스트 크기를 자동으로 조정하지 않도록 수정 */
+        body, table, td, p, a, li, blockquote {
+            -ms-text-size-adjust: 100%;
+            -webkit-text-size-adjust: 100%;
+        }
+    </style>
+
+    <style>
+        table {
+            /*border-collapse: collapse;*/
+        }
+
+        .table-survey-info {
+            padding: 5px;
+        }
+
+        .table-empathy-type-indicator-point {
+            border: 1px solid #6f4f28;
+        }
+
+        .table-empathy-type-indicator-point td {
+            border: 1px solid #6f4f28;
+        }
+
+        .table-empathy-type-indicator {
+
+        }
+
+        .table-empathy-three-type {
+            border: 1px solid #6f4f28;
+        }
+
+        .table-empathy-three-type td {
+            border: 1px solid #6f4f28;
+            color: black;
+        }
+
+        .table-expression-type {
+            border-collapse: collapse;
+        }
+
+        .table-empathy-types {
+        }
+
+        .table-expression-type td {
+            padding-bottom: 10px;
+            padding-top: 10px;
+            border-top: 1px solid black;
+            border-bottom: 1px solid black;
+        }
+
+        .table-empathy-types td {
+            padding-top: 10px;
+            padding-bottom: 10px;
+            padding-left: 5px;
+            padding-right: 5px;
+            border: 1px solid white;
+        }
+
+        .table-expression-type .conclusion {
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+<table border="0" cellpadding="0" cellspacing="0" width="600" align="center" id="bodyTable">
+    <tr>
+        <td>
+            <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                <!-- Title -->
+                <tr>
+                    <td align="center" width="100%" style="padding-bottom: 40px;">
+                        <h1 style="display: inline">이메일 인증</h1> <!-- <span>[청소년용]</span> -->
+                    </td>
+                </tr>
+                <!-- Survey Info -->
+                <tr>
+                    <td style="padding-bottom: 40px;">
+                        <table class="table-survey-info" border="0" cellpadding="0" cellspacing="0" width="100%"
+                               bgcolor="#FBFBFB"
+                               style="padding: 10px 10px 10px 10px">
+                            <tr>
+                                <td>
+                                    <table border="0" cellpadding="5px" cellspacing="0" width="100%"
+                                           style="padding-bottom: 5px">
+                                        <tr>
+                                            <td width="20%"><b>기관명</b></td>
+                                            <!--/*@thymesVar id="organization" type="java.lang.String"*/-->
+                                            <td width="80%" align="center" th:text="${organization}" ></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table border="0" cellpadding="5px" cellspacing="0" width="100%"
+                                           style="padding-bottom: 5px">
+                                        <td width="20%"><b>성명</b></td>
+                                        <td width="30%" th:text="${name}"></td>
+                                        <td width="20%">
+                                        <b>계정 아이디</b></td>
+                                        <td width="30%" th:text="${accountId}"></td>
+                                    </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td>
+                                    <table border="0" cellpadding="5px" cellspacing="0" width="100%"
+                                           style="padding-bottom: 5px">
+                                        <td width="20%">
+                                        <b>인증 내용</b></td>
+                                        <td width="30%" th:text="${emailVertify}"></td>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

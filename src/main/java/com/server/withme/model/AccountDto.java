@@ -30,7 +30,6 @@ public class AccountDto {
     @NotNull
     private Date createAt;  
 
-    @NotNull
     private String username;
     
     @JsonIgnore
@@ -48,8 +47,11 @@ public class AccountDto {
     
     public static AccountDto createAccountDto(Account account) {
 		return AccountDto.builder()
+				.accountId(account.getAccountId())
 			    .createAt(account.getCreateAt())
+			    .username(account.getUsername())
 			    .name(account.getName())
+			    .email(account.getEmail())
 			    .emailVerified(account.getEmailVerified())
 			    .accountType(account.getAccountType()).build();
 	}

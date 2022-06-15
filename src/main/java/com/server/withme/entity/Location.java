@@ -1,5 +1,6 @@
 package com.server.withme.entity;
 
+import java.sql.Timestamp;
 import java.util.Date;
 
 import javax.persistence.Column;
@@ -74,7 +75,7 @@ public class Location implements IVertexDto{
     
 	 public static Location createLocationEntity(LocationDto locationDto, AccountOption accountOption) {
 	    return Location.builder()
-		.createAt(locationDto.getTtlDto().getTtl())
+		.createAt(new Timestamp(System.currentTimeMillis()))
 		.name(locationDto.getName())
 		.latitude(locationDto.getVertexDto().getLatitude())
 		.longitude(locationDto.getVertexDto().getLongitude())

@@ -55,8 +55,9 @@ public class SchedularService implements ISchedularService{
 			List<VertexDto> vertexDto = vertexCheckUtil.checkSafeZoneMinSize(locationList);
 			
 			if(vertexDto.get(0).getTF()) {
-				accountOption = accountOptionRepository.update(accountOption.getId(), 
-						vertexDto.get(0).getLatitude(),vertexDto.get(0).getLongitude());
+				//accountOption = 
+				accountOptionRepository.updateQuery(vertexDto.get(0).getLatitude(),
+						vertexDto.get(0).getLongitude(),accountOption.getId());
 				
 				List<VertexDto> vertexDtoList= vertexUtil.calculateVertex(locationList);
 				List<TTL> ttlList = ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
@@ -105,7 +106,7 @@ public class SchedularService implements ISchedularService{
 				}
 			}
 			ttlService.deleteAllTTLById(ttlIdList);
-			accountOptionRepository.update(accountOption.getId(), x,y);
+			accountOptionRepository.updateQuery(x,y,accountOption.getId());
 		}
 	}
 }

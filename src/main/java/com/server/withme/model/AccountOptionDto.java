@@ -34,10 +34,8 @@ public class AccountOptionDto {
 	 
 	 private Boolean safeMove;
 	 
-	 @NotNull
 	 private Double xPoint;
 	 
-	 @NotNull
 	 private Double yPoint;
 	 
 	 private UUID accountId;

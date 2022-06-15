@@ -54,13 +54,15 @@ public class SafeZoneService implements ISafeZoneService{
 	
 	private final IVertexCheckUtil vertexCheckUtil;
 	
+	@Transactional
 	@Override
 	public VertexDto saveInitSafeZone(SafeZoneDto safeZoneDto, AccountOption accountOption) {
 		
 		List<VertexDto> initSafeZoneList = safeZoneDto.getSafeZone();
 		VertexDto vertexDto = vertexCheckUtil.checkSafeZoneMinSize(initSafeZoneList).get(0);
 		if(vertexDto.getTF()) {
-			accountOption = accountOptionRepository.update(accountOption.getId(), vertexDto.getLatitude(),vertexDto.getLongitude());
+			//accountOption = 
+			accountOptionRepository.updateQuery(vertexDto.getLatitude(),vertexDto.getLongitude(),accountOption.getId());
 			for(VertexDto vertex: initSafeZoneList) 
 				initSafeZoneRepository.save(InitSafeZone.createInitSafeZoneEntity(vertex,accountOption));
 		}
@@ -68,18 +70,35 @@ public class SafeZoneService implements ISafeZoneService{
 	}
 	
 	@Override
-	public List<VertexDto> saveSafeZoneFirstTime(List<VertexDto> safeZone, AccountOption accountOption) {
+	public void saveAll(List<SafeZone> safeZoneList, int count) {
+		int localCount=0;
+		while(localCount< count) {
+			safeZoneRepository.save(safeZoneList.get(localCount));
+			localCount++;
+		}
+	}
+	
+	@Override
+	public List<VertexDto> saveSafeZoneFirstTime(List<VertexDto> safeZone, AccountOption accountOption) {		
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
+		List<SafeZone> safeZoneList = new ArrayList<>();		
 		int count=0;
+		
 		for(TTL ttl: ttlList) {
 			while(true) {
 				if(count% 4 == 0 && count != 0)
 					break;
 				//spring batch bulk로 create하기
-				safeZoneRepository.save(SafeZone.createSafeZoneEntity(safeZone.get(count),ttl));	
+				safeZoneList.add(SafeZone.createSafeZoneEntity(safeZone.get(count),ttl));	
 				count++;
 			}
 		}
+		int localCount=0;
+		while(localCount + 1000 < count) {
+			this.saveAll(safeZoneList.subList(localCount, localCount+1000), 1000);
+			localCount+=1000;
+		}
+		this.saveAll(safeZoneList.subList(localCount, count), count-localCount);
 		return safeZone;
 	}
 	
@@ -120,15 +139,14 @@ public class SafeZoneService implements ISafeZoneService{
 	@Transactional
 	public List<InitSafeZone> loadInitSafeZoneList(AccountIdDto accountIdDto){
 		Account account = accountRepository.findByFetchAccountOption(accountIdDto.getAccountId()).orElseThrow(() 
-        		-> new UsernameNotFoundException("not found user"));
+        		-> new UsernameNotFoundException("not found user"));		
 		return this.findByAccountOptionIdOrThrow(account.getAccountOption().getId());
 	}
 
 	@Override
 	public List<InitSafeZone> findByAccountOptionIdOrThrow(Integer accountOptionId){
 		AccountOption accountOption= accountOptionRepository.findByFetchInitSafeZone(accountOptionId).orElseThrow(()
-							-> new UsernameNotFoundException("not found accountOption"));
-	
+							-> new UsernameNotFoundException("not found accountOption"));		
 		return accountOption.getInitSafeZoneList();
 	}
 	

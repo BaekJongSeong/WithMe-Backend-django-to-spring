@@ -6,6 +6,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -35,9 +36,17 @@ public class AccountService implements IAccountService {
     
     private final PasswordEncoder passwordEncoder;
     
-	@Override
-    public UserDetails loadUserByUsername(String username) {
-        return (UserDetails) this.findByUsernameOrThrow(username);
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Account account = accountRepository.findByUsername(username).orElse(null);
+
+        if (account == null)
+            throw new UsernameNotFoundException(username);
+
+        return User.builder()
+                .username(account.getUsername())
+                .password(account.getPassword())
+                .roles("").build();
     }
 	
 	@Override

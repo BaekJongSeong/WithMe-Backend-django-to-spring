@@ -1,6 +1,7 @@
 package com.server.withme.serivce.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -34,11 +35,13 @@ public class TTLService implements ITTLService{
 	
 	@Override
 	public void saveTTLFirstTime(List<VertexDto> initSafeZoneList, AccountOption accountOption) {
-			Integer count = vertexCheckUtil.countSafeZone(initSafeZoneList);
+			Integer count = vertexCheckUtil.countSafeZone(initSafeZoneList);			
+			List<TTL> ttlList = new ArrayList<>();
 			for(int idx=0; idx< count; idx++)
-				ttlRepository.save(TTL.createTTLEntity(
+				ttlList.add(TTL.createTTLEntity(
 						DayCalculator.SEVEN.calculateDay(new Timestamp(System.currentTimeMillis())).getTime(),
 						accountOption));
+			ttlRepository.saveAll(ttlList);
 	}
 	
 	@Override 

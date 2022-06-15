@@ -1,11 +1,11 @@
 package com.server.withme.controller;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.UUID;
+
+import javax.transaction.Transactional;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -25,9 +26,9 @@ import com.server.withme.entity.AccountOption;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LocationDto;
 import com.server.withme.model.SafeZoneDto;
-import com.server.withme.model.SafeZoneInfoDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.serivce.IAccountOptionService;
+import com.server.withme.serivce.IMailService;
 import com.server.withme.serivce.ISafeZoneService;
 import com.server.withme.util.IVertexUtil;
 
@@ -47,6 +48,8 @@ public class SafeZoneController {
 	
 	private final ISafeZoneService safeZoneService;
 	
+	private final IMailService mailService;
+	
 	private final IVertexUtil vertexUtil;
 	
     private final Logger logger = LoggerFactory.getLogger(SafeZoneController.class);
@@ -54,19 +57,18 @@ public class SafeZoneController {
 	@PostMapping("/safe-zone/init/{accountId}")
     public String saveInitSafeZone (
             @PathVariable UUID accountId,
-            @Validated @RequestBody SafeZoneDto safeZoneDto
+            @Validated @RequestBody SafeZoneDto safeZoneDto,
+            @RequestHeader("Authorization") String token
     ) {
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);			
 		VertexDto vertexDto = safeZoneService.saveInitSafeZone(safeZoneDto, accountOption);
 			MDC.put("loggerFileName", accountOption.getAccount().getAccountId()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-			logger.info(accountOption.getAccount().getUsername() +" are waiting for mail send session.");
+			logger.info(accountOption.getAccount().getUsername() +" are going to input init-safe-zone.");
 			logger.info(accountOption.getAccount().getAccountId() +"is saving init-safe-zone successed.");
 			MDC.remove("loggerFileName");
-		
-		httpServletResponse.sendRedirect("https://naver.com");
-			
-		SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto.craeteSafeZoneInfoDto(
-					new ArrayList<VertexDto>(Arrays.asList(vertexDto)), vertexDto.getTF(),0);
+			mailService.reDirectUrl(token.split(" ")[1],accountId.toString(),safeZoneDto);
+		//SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto.craeteSafeZoneInfoDto(
+		//			new ArrayList<VertexDto>(Arrays.asList(vertexDto)), vertexDto.getTF(),0);
 		return "http://121.154.58.201:8040/admin/?username=withmeuser&password=adminuser";
     }
 	
@@ -75,10 +77,10 @@ public class SafeZoneController {
             @PathVariable UUID accountId,
             @Validated @RequestBody SafeZoneDto safeZoneDto
     ) {
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountId);		
 		List<VertexDto> safeZoneList= safeZoneService.saveSafeZoneFirstTime(vertexUtil.calculateVertex(safeZoneDto.getSafeZone()),accountOption);
 			MDC.put("loggerFileName", accountId.toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
-			logger.info(accountOption.getAccount().getUsername() +"is removing safe zone boxes");
+			logger.info(accountOption.getAccount().getUsername() +"is saving all safe zone boxes refer to init-safe-zone");
 			logger.info(safeZoneList.size() + " are created.\n" + safeZoneList.toString());
 			MDC.remove("loggerFileName");
 		return new ResponseEntity<>(SafeZoneDto.builder()

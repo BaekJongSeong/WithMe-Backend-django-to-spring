@@ -13,7 +13,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.auth.oauth2.GoogleCredentials;
 import com.google.firebase.messaging.FirebaseMessagingException;
-import com.software.course.Model.FcmMessage;
+import com.server.withme.model.FcmMessage;
 
 import lombok.RequiredArgsConstructor;
 import okhttp3.MediaType;

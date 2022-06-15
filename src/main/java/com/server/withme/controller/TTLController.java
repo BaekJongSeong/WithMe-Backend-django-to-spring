@@ -46,12 +46,11 @@ public class TTLController {
     public ResponseEntity<TTLDto> saveTTL (
             @Validated @RequestBody AccountIdDto accountIdDto
     ) {
-		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());
-		
+		AccountOption accountOption = accountOptionService.findByAccountIdOrThrow(accountIdDto.getAccountId());		
 		List<VertexDto> vertexDtoList = vertexUtil.convertToVertexDto(
-				safeZoneService.loadInitSafeZoneList(accountIdDto));
-		
+				safeZoneService.loadInitSafeZoneList(accountIdDto));		
 		ttlService.saveTTLFirstTime(vertexDtoList,accountOption);
+		
 		TTLDto ttlDto = TTLDto.createTTLDto(DayCalculator.ZERO.calculateDay(new Timestamp(System.currentTimeMillis())).getTime());
         return new ResponseEntity<>(ttlDto,new HttpHeaders(),HttpStatus.OK);
     }

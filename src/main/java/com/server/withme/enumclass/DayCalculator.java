@@ -10,6 +10,7 @@ public enum DayCalculator {
 	ZERO{
 		public Calendar calculateDay(Date date) { 
 			cal.setTime(date);
+			cal.add(Calendar.HOUR, 9);
 			return cal;
 		}
 	},
@@ -21,12 +22,14 @@ public enum DayCalculator {
 			cal.add(Calendar.DATE, 1);
 			if(cal.getTime().getTime() > calStandard.getTime().getTime())
 				cal.setTime(date);
+			cal.add(Calendar.HOUR, 9);
 			return cal;}
 	},
 	SEVEN{
 		public Calendar calculateDay(Date date){
 			cal.setTime(date);
 			cal.add(Calendar.DATE, 7);
+			cal.add(Calendar.HOUR, 9);
 			return cal;
 			}
 	};

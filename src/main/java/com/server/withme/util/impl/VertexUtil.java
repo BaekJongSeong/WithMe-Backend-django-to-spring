@@ -65,7 +65,7 @@ public class VertexUtil implements IVertexUtil{
 		List<VertexDto> vertexDtoList = vertexCheckUtil.findMinMaxVertex(initSafeZoneList);
 		
 		double x= vertexDtoList.get(0).getLatitude();
-		Double perBoxSize = (double) (100/100000);
+		Double perBoxSize = ((double)100/(double)100000);
 		
 		while(x > vertexDtoList.get(1).getLatitude()) {
 			
@@ -75,7 +75,7 @@ public class VertexUtil implements IVertexUtil{
 				this.createNewSafeZone(safeZoneList,x,y,perBoxSize);
 				y += perBoxSize;
 			}
-			x += perBoxSize;
+			x -= perBoxSize;
 		}
 		return safeZoneList;
 	}

@@ -1,13 +1,10 @@
 package com.server.withme.serivce.impl;
 
-import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
-import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import javax.mail.internet.MimeMessage;
@@ -25,6 +22,7 @@ import org.thymeleaf.context.Context;
 
 import com.server.withme.entity.Account;
 import com.server.withme.model.LocationDto;
+import com.server.withme.model.SafeZoneDto;
 import com.server.withme.model.SendMailDto;
 import com.server.withme.model.VertexDto;
 import com.server.withme.serivce.IAccountService;
@@ -62,7 +60,7 @@ public class MailService implements IMailService{
 		ctx.setVariable("title", "[WithMe] withme 서비스 이메일 인증");
 		ctx.setVariable("organization", "WithMe");
 		ctx.setVariable("name", account.getName());
-		ctx.setVariable("accountId", "accountId는 "+account.getAccountId());
+		ctx.setVariable("accountId", "accountId는 "+account.getAccountId().toString());
 		ctx.setVariable("emailVertify", "안녕하세요 "+account.getName()+"님\n WithMe 서비스에 가입해주셔서 감사합니다. 이메일 인증을 완료해주세요.");
 
 		String contents = this.changeContextToString(ctx);
@@ -102,22 +100,15 @@ public class MailService implements IMailService{
     	return username +"님, "+" 경로 안내입니다.\n";
     }
     
-    @Override 
-    ResponseEntity<String> reDirectUrl(String token){
+    @Override
+	public ResponseEntity<String> reDirectUrl(String token, String uid, SafeZoneDto safeZoneDto){
     	URI uri = UriComponentsBuilder
     			.fromUriString("http://121.154.58.201:8040")
-    			.path("/map-direction-15/v1/driving")
-    			.queryParam("start",encode1)
-    			.queryParam("goal",encode2).encode().build().toUri();
+    			.path("/zone_manage/certify_put/").encode().build().toUri();
     	
     	RestTemplate restTemplate = new RestTemplate();
-
-    	RequestEntity<Void> req = RequestEntity.get(uri)
-    	.header("X-NCP-APIGW-API-KEY-ID",key)
-    	.header("X-NCP-APIGW-API-KEY",password)
-    	.build();
-
-    	ResponseEntity<String> result = restTemplate.exchange(req,String.class);
+    	RequestEntity<Void> req = RequestEntity.get(uri).header("AccessToken",token).build();
+    	return restTemplate.exchange(req,String.class);
     }
     
     @Override

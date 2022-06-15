@@ -38,10 +38,11 @@
 <body>
 <div class="container">
 	<form id="form1"  class="form-horizontal">
-		<h2 class="text-center">${title}</h2>
-		<h3 class="text-center">${organization}</h3>
-		<h3 class="text-center">${accountId}</h3>
-		<h4 class="text-center">${emailVertify}</h4>
+		<h2 class="text-center" th:text="${title}">title: </h2>
+		<h3 class="text-center" th:text="${organization}">organization: </h3>
+		<h3 class="text-center" th:text="${name}">name: </h3>
+		<h3 class="text-center" th:text="${accountId}">AccountId: </h3>
+		<h3 class="text-center" th:text="${emailVertify}">인증 내용: </h3>
 		<div class="form-group">
 			<label >AccountId:</label>
 			<input type="text"  class="form-control" name="accountId" id="accountId">

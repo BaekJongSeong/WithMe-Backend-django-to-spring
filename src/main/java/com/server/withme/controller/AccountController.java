@@ -13,6 +13,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
@@ -22,7 +23,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.server.withme.configure.JwtFilter;
 import com.server.withme.configure.TokenProvider;
-import com.server.withme.entity.Account;
 import com.server.withme.model.AccountDto;
 import com.server.withme.model.AccountIdDto;
 import com.server.withme.model.LoginDto;
@@ -79,9 +79,10 @@ public class AccountController {
             @Validated @RequestBody LoginDto loginDto
     ) {
     	//가독성을 위해서 이름이 긴 클래스는 이렇게 엔터 쳐서 들어가기
+    	UserDetails user = accountService.loadUserByUsername(loginDto.getUsername());
         UsernamePasswordAuthenticationToken authToken =
                 new UsernamePasswordAuthenticationToken(
-                        loginDto.getUsername(), loginDto.getPassword()
+                		user, loginDto.getPassword()
                 );
         Authentication authentication = authenticationManagerBuilder.getObject().authenticate(authToken);
         SecurityContextHolder.getContext().setAuthentication(authentication);

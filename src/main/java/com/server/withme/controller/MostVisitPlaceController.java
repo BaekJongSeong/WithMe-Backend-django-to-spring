@@ -1,25 +1,5 @@
 package com.server.withme.controller;
 
-import java.util.UUID;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.validation.annotation.Validated;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.thymeleaf.context.Context;
-
-import com.server.withme.entity.Account;
-import com.server.withme.model.AccountIdDto;
-import com.server.withme.model.SendMailDto;
-import com.server.withme.serivce.IAccountService;
-import com.server.withme.serivce.ILocationService;
-import com.server.withme.serivce.IMailService;
-
-import lombok.RequiredArgsConstructor;
-
 /**
  * API Controller
  *

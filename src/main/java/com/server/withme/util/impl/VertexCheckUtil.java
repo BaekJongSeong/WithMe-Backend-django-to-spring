@@ -35,7 +35,7 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 	private final AccountOptionRepository accountOptionRepository;
 		
 	public boolean checkIfTrue(List<VertexDto> vertexDtoList) {
-		return (vertexDtoList.get(1).getLongitude() - vertexDtoList.get(0).getLongitude() > 0.0423) ? true: false;
+		return (vertexDtoList.get(1).getLongitude() - vertexDtoList.get(0).getLongitude() > 0.01) ? true: false;
 	}
 	
 	//4.23KM 기준으로 움직임
@@ -43,7 +43,7 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 	public List<VertexDto> checkSafeZoneMinSize(List<VertexDto> safeZoneList) {
 		
 		List<VertexDto> vertexDtoList = this.findMinMaxVertex(safeZoneList);
-		boolean TF = (vertexDtoList.get(0).getLatitude() - vertexDtoList.get(1).getLatitude() > 0.0423) ? this.checkIfTrue(vertexDtoList): false;
+		boolean TF = (vertexDtoList.get(0).getLatitude() - vertexDtoList.get(1).getLatitude() > 0.01) ? this.checkIfTrue(vertexDtoList): false;
 		vertexDtoList.get(0).setTF(TF);
 		vertexDtoList.get(1).setTF(TF);
 	
@@ -67,23 +67,24 @@ public class VertexCheckUtil implements IVertexCheckUtil{
 	public Integer countSafeZone(List<VertexDto> initSafeZoneListChanged) {
 				
 		List<VertexDto> vertexDtoList = this.findMinMaxVertex(initSafeZoneListChanged);
-		
+
 		double x= vertexDtoList.get(0).getLatitude();
-		Double perBoxSize = (double) (100/100000);
-		Integer row=0,col=0;
+		double perBoxSize = ((double)100/(double)100000);
+		Integer row=0,colCache=0;
 		
 		while(x > vertexDtoList.get(1).getLatitude()) {
-			
+			Integer col=0;
 			double y=vertexDtoList.get(0).getLongitude();
 			
 			while(y < vertexDtoList.get(1).getLongitude()) {
 				y += perBoxSize;
 				col++;
 			}
-			x += perBoxSize;
+			x -= perBoxSize;
 			row++;
+			colCache=col;
 		}
-		return row * col;
+		return row * colCache;
 	}
 	
 	@Override

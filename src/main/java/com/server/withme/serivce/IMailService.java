@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.thymeleaf.context.Context;
 
 import com.server.withme.model.LocationDto;
+import com.server.withme.model.SafeZoneDto;
 import com.server.withme.model.SendMailDto;
 
 /**
@@ -21,8 +22,8 @@ public interface IMailService {
 	
 	public String changeContextToString(Context ctx);
 	
-	ResponseEntity<String> reDirectUrl(String token);
-	
+    ResponseEntity<String> reDirectUrl(String token, String uid, SafeZoneDto safeZoneDto);
+    
 	public String pathSearching(String name,Double latitude,Double longitude,LocationDto locationDto);
 	
     public String makeAlarmTitle(String username);
