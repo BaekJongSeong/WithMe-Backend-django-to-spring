@@ -56,7 +56,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/swagger-ui/**",
             // -- Authentication
             "/api/account",
-            "/api/login"
+            "/api/login",
+            "/safe-zone/init/{accountId}",
+            "/safe-zone/{accountId}"
     };
 
     @Bean

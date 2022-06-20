@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
 import com.server.withme.entity.SafeZone;
 
 import lombok.RequiredArgsConstructor;
-
+/*
 
 @RequiredArgsConstructor
 public class SafeZoneRepositoryImpl implements SafeZoneRepository{
@@ -57,3 +57,4 @@ public class SafeZoneRepositoryImpl implements SafeZoneRepository{
         return batchCount;
     }
 }
+*/

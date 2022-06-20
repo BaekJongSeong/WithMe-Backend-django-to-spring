@@ -66,10 +66,10 @@ public class SafeZoneController {
 			logger.info(accountOption.getAccount().getUsername() +" are going to input init-safe-zone.");
 			logger.info(accountOption.getAccount().getAccountId() +"is saving init-safe-zone successed.");
 			MDC.remove("loggerFileName");
-			mailService.reDirectUrl(token.split(" ")[1],accountId.toString(),safeZoneDto);
+		//	mailService.reDirectUrl(token.split(" ")[1],accountId.toString(),safeZoneDto);
 		//SafeZoneInfoDto<VertexDto> safeZoneInfoDto = SafeZoneInfoDto.craeteSafeZoneInfoDto(
 		//			new ArrayList<VertexDto>(Arrays.asList(vertexDto)), vertexDto.getTF(),0);
-		return "http://121.154.58.201:8040/admin/?username=withmeuser&password=adminuser";
+		return"";//return "http://121.154.58.201:8040/admin/?username=withmeuser&password=adminuser";
     }
 	
 	@PostMapping("/safe-zone/{accountId}")
@@ -81,7 +81,7 @@ public class SafeZoneController {
 		List<VertexDto> safeZoneList= safeZoneService.saveSafeZoneFirstTime(vertexUtil.calculateVertex(safeZoneDto.getSafeZone()),accountOption);
 			MDC.put("loggerFileName", accountId.toString()+"_"+new SimpleDateFormat("yyyy-MM-dd").format(new Date()));
 			logger.info(accountOption.getAccount().getUsername() +"is saving all safe zone boxes refer to init-safe-zone");
-			logger.info(safeZoneList.size() + " are created.\n" + safeZoneList.toString());
+			logger.info(safeZoneList.size() + " are created.\n"+ safeZoneList.toString());
 			MDC.remove("loggerFileName");
 		return new ResponseEntity<>(SafeZoneDto.builder()
         		.safeZone(safeZoneList).build(),new HttpHeaders(),HttpStatus.OK);

@@ -70,35 +70,20 @@ public class SafeZoneService implements ISafeZoneService{
 	}
 	
 	@Override
-	public void saveAll(List<SafeZone> safeZoneList, int count) {
-		int localCount=0;
-		while(localCount< count) {
-			safeZoneRepository.save(safeZoneList.get(localCount));
-			localCount++;
-		}
-	}
-	
-	@Override
 	public List<VertexDto> saveSafeZoneFirstTime(List<VertexDto> safeZone, AccountOption accountOption) {		
 		List<TTL> ttlList= ttlService.findByAccountOptionIdOrThrow(accountOption.getId());
 		List<SafeZone> safeZoneList = new ArrayList<>();		
-		int count=0;
-		
+				
 		for(TTL ttl: ttlList) {
+			int count=0;
 			while(true) {
 				if(count% 4 == 0 && count != 0)
 					break;
-				//spring batch bulk로 create하기
 				safeZoneList.add(SafeZone.createSafeZoneEntity(safeZone.get(count),ttl));	
 				count++;
 			}
 		}
-		int localCount=0;
-		while(localCount + 1000 < count) {
-			this.saveAll(safeZoneList.subList(localCount, localCount+1000), 1000);
-			localCount+=1000;
-		}
-		this.saveAll(safeZoneList.subList(localCount, count), count-localCount);
+		safeZoneRepository.saveAll(safeZoneList);	
 		return safeZone;
 	}
 	

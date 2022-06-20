@@ -19,9 +19,7 @@ import com.server.withme.model.VertexDto;
 public interface ISafeZoneService {
 
 	public VertexDto saveInitSafeZone(SafeZoneDto initSafeZoneDto, AccountOption accountOption);
-	
-	public void saveAll(List<SafeZone> safeZoneList, int count);
-	
+		
 	public List<VertexDto> saveSafeZoneFirstTime(List<VertexDto> safeZone, AccountOption accountOption);
 	
 	public List<VertexDto> deleteSafeZoneFirstTime(AccountOption accountOption);
